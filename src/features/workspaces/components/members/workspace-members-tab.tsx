@@ -9,7 +9,7 @@ import { InviteMemberDialog } from "../invite-member-dialog";
 export const WorkspaceMembersTab = () => {
   const { workspace } = useWorkspace();
   const {user} = useUser();
-  const canManage = workspace!.owner.id === user!.id
+  const canManage = workspace!.owner!.id === user!.id
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 sm:p-6">

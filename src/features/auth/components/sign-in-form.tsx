@@ -30,12 +30,12 @@ export const SignInForm = () => {
     const {name, value} = e.target;
     setValues(prev => ({...prev, [name]: value}))
   }
-  const {mutate, isPending} = useMutation<unknown,ApiError, SignInInput>({
+  const {mutate, isPending} = useMutation<{accessToken: string , refreshToken: string},ApiError, SignInInput>({
     mutationFn: authApi.signIn,
-    onSuccess: (data: {accessToken: string , refreshToken: string}) => {
+    onSuccess: (data) => {
       toast.success('Login successfully')
       localStorage.setItem('access-token', data.accessToken)
-      localStorage.setItem('refresh-token', data.refreshToken)
+      localStorage.setItem('refresh-token', data.refreshToken!)
       setTimeout(() => {
         navigate(homePath())
       }, 800)

@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatar, getInitials } from "@/lib/utils";
-import { getUserById } from "@/lib/mock-data";
 import type { Chat } from "@/types";
 
 interface ChatDetailsSheetProps {

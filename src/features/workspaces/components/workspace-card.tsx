@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { EyeIcon, MoreVerticalIcon, PencilIcon, Trash2Icon, UsersIcon } from "lucide-react";
+import {  UsersIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { RoleBadge } from "@/components/shared/role-badge";
 import { getInitials } from "@/lib/utils";
-import { getMyRoleInWorkspace } from "@/lib/mock-data";
 import { workspacePath } from "@/paths";
 import { WorkspaceStatus, type Workspace } from "@/types";
 import { EditWorkspaceDialog } from "./edit-workspace-dialog";
@@ -29,7 +21,7 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 
 export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
   const { user } = useUser();
-  const myRole = workspace.members.find((m) => m.userId === user.id)?.role;
+  const myRole = workspace.members.find((m) => m.userId === user!.id)?.role;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RoleBadge } from "@/components/shared/role-badge";
 import { getInitials } from "@/lib/utils";
-import { getMyRoleInWorkspace } from "@/lib/mock-data";
 import { workspacePath } from "@/paths";
 import { WorkspaceStatus, type Workspace } from "@/types";
 import { EditWorkspaceDialog } from "./edit-workspace-dialog";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+import { useUser } from "@/features/auth/hooks/use-user";
 
 const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline"> = {
   [WorkspaceStatus.active]: "default",
@@ -26,7 +26,8 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 };
 
 export const WorkspaceListItem = ({ workspace }: { workspace: Workspace }) => {
-  const myRole = getMyRoleInWorkspace(workspace);
+  const { user } = useUser();
+  const myRole = workspace.members.find((member) => member.userId === user?.id)?.role;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

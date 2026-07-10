@@ -21,7 +21,7 @@ export const ChatList = ({ chats, selectedChatKey, onSelectChat }: ChatListProps
       <div className="flex items-center justify-between gap-2 border-b p-3">
         <h2 className="text-sm font-semibold">Chats</h2>
         <CreateChatDialog
-          workspace={workspace}
+          workspace={workspace!}
           trigger={
             <Button size="sm" variant="outline">
               <PlusIcon />

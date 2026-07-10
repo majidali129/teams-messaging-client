@@ -9,13 +9,13 @@ import { Toaster } from "sonner";
 
 const queryClient = new QueryClient()
 createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
+  <StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <App />
-        {/* <ReactQueryDevtools buttonPosition="top-right" initialIsOpen={false} /> */}
+        <ReactQueryDevtools buttonPosition="top-right" initialIsOpen={false} />
         <Toaster position="top-right" expand richColors closeButton />
       </QueryClientProvider>
     </BrowserRouter>
-  // </StrictMode>,
+  </StrictMode>,
 );

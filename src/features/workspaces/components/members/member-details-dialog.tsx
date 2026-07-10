@@ -7,15 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RoleBadge } from "@/components/shared/role-badge";
-import { getInitials } from "@/lib/utils";
-import type { WorkspaceMemberWithUser } from "@/types";
+import { getAvatar, getInitials } from "@/lib/utils";
+import type { WorkspaceMember } from "@/types";
 
 export const MemberDetailsDialog = ({
   member,
   open,
   onOpenChange,
 }: {
-  member: WorkspaceMemberWithUser;
+  member: WorkspaceMember;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
@@ -30,12 +30,12 @@ export const MemberDetailsDialog = ({
         </DialogHeader>
         <div className="flex items-center gap-3">
           <Avatar size="lg">
-            <AvatarImage src={user?.avatar?.url} alt={user?.name} />
-            <AvatarFallback>{user ? getInitials(user.name) : "?"}</AvatarFallback>
+            <AvatarImage src={getAvatar(user.name)} alt={user.name} />
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{user?.name ?? "Unknown user"}</p>
-            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <p className="font-medium">{user.name}</p>
+            <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
         </div>
         <dl className="grid grid-cols-2 gap-3 text-sm">

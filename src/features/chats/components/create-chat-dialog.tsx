@@ -15,9 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
-import { getInitials } from "@/lib/utils";
-import { CURRENT_USER_ID, getUserById } from "@/lib/mock-data";
+import { getAvatar, getInitials } from "@/lib/utils";
 import type { Workspace } from "@/types";
+import { useUser } from "@/features/auth/hooks/use-user";
 
 interface CreateChatDialogProps {
   workspace: Workspace;
@@ -25,9 +25,10 @@ interface CreateChatDialogProps {
 }
 
 export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) => {
+  const { user } = useUser();
   const otherMembers = workspace.members
-    .filter((member) => member.userId !== CURRENT_USER_ID)
-    .map((member) => getUserById(member.userId))
+    .filter((member) => member.userId !== user!.id)
+    .map((member) => member.user)
     .filter((user): user is NonNullable<typeof user> => Boolean(user));
 
   return (
@@ -68,8 +69,8 @@ export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) 
                 >
                   <Checkbox id={`participant-${user.id}`} name="participants" value={user.id} />
                   <Avatar size="sm">
-                    <AvatarImage src={user.avatar?.url} alt={user.name} />
-                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    <AvatarImage src={getAvatar(user.name!)} alt={user.name!} />
+                    <AvatarFallback>{getInitials(user.name!)}</AvatarFallback>
                   </Avatar>
                   <span className="text-sm">{user.name}</span>
                 </label>

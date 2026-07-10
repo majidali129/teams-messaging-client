@@ -1,18 +1,17 @@
-import { Button } from "@/components/ui/button";
 import { RoleBadge } from "@/components/shared/role-badge";
-import { InviteStatus, type Invite } from "@/types";
+import { type Invite } from "@/types";
 import { InviteStatusBadge } from "./invite-status-badge";
 
 export const InviteListItem = ({ invite }: { invite: Invite }) => {
   const inviter = invite.invitedBy;
-  const isPending = invite.status === InviteStatus.pending;
+  // const isPending = invite.status === InviteStatus.pending;
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-3 sm:flex-row sm:items-center">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{invite.email}</p>
         <p className="text-xs text-muted-foreground">
-          Invited by {inviter?.name} · expires{" "}
+          Invited by {inviter.name} · expires{" "}
           {new Date(invite.expiresAt).toLocaleDateString()}
         </p>
       </div>

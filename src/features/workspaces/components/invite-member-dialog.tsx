@@ -31,7 +31,7 @@ export const InviteMemberDialog = ({ trigger }: { trigger: ReactElement }) => {
   const queryClient = useQueryClient()  
   const {id: workspaceId} = useParams()
   const [open, setOpen] = useState(false)
-  const [values, setValues] = useState({
+  const [values, setValues] = useState<{email: string, role: WorkspaceRole}>({
     email: '',
     role: WorkspaceRole.member,
   })
@@ -83,13 +83,13 @@ export const InviteMemberDialog = ({ trigger }: { trigger: ReactElement }) => {
 
           <div>
             <Label htmlFor="invite-role">Role</Label>
-            <Select name="role" defaultValue={WorkspaceRole.member} value={values.role} onValueChange={(value) => setValues({ ...values, role: value })}>
+            <Select name="role" defaultValue={WorkspaceRole.member.toString()} value={values.role} onValueChange={(value) => setValues({ ...values, role: value as WorkspaceRole })}>
               <SelectTrigger id="invite-role" className="mt-1.5 w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={WorkspaceRole.member}>Member</SelectItem>
-                <SelectItem value={WorkspaceRole.guest}>Guest</SelectItem>
+                <SelectItem value={WorkspaceRole.member.toString()}>Member</SelectItem>
+                <SelectItem value={WorkspaceRole.guest.toString()}>Guest</SelectItem>
               </SelectContent>
             </Select>
             <FieldError error={undefined} />

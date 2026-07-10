@@ -31,7 +31,7 @@ export const WorkspaceChatsTab = () => {
       {renderError()}
         <ChatList
           chats={chats}
-          selectedChatKey={selectedChatKey}
+          selectedChatKey={selectedChatKey ?? ''}
           onSelectChat={setSelectedChatKey}
         />
 

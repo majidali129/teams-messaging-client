@@ -11,15 +11,15 @@ export const WorkspaceOverviewTab = () => {
   // const workspace = getWorkspaceById(id);
   if (!workspace && !isLoading && error) return <ErrorState title="Failed to load workspace" description="Please try again later" />
 
-  const owner = workspace.owner;
+  const owner = workspace!.owner;
 
   const stats = [
-    { label: "Members", value: workspace.members.length, icon: UsersIcon },
-    { label: "Chats", value: workspace.chatCount, icon: MessagesSquareIcon },
-    { label: "Status", value: workspace.status, icon: ShieldCheckIcon, capitalize: true },
+    { label: "Members", value: workspace!.members.length, icon: UsersIcon },
+    { label: "Chats", value: workspace!.chatCount, icon: MessagesSquareIcon },
+    { label: "Status", value: workspace!.status, icon: ShieldCheckIcon, capitalize: true },
     {
       label: "Created",
-      value: new Date(workspace.createdAt).toLocaleDateString(undefined, {
+      value: new Date(workspace!.createdAt).toLocaleDateString(undefined, {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -63,11 +63,11 @@ export const WorkspaceOverviewTab = () => {
           <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted-foreground">Workspace ID</dt>
-              <dd className="font-mono text-xs">{workspace.id}</dd>
+              <dd className="font-mono text-xs">{workspace!.id}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Last updated</dt>
-              <dd>{new Date(workspace.updatedAt).toLocaleString()}</dd>
+              <dd>{new Date(workspace!.updatedAt).toLocaleString()}</dd>
             </div>
           </dl>
         </CardContent>

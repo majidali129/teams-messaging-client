@@ -18,7 +18,7 @@ import type { SignUpInput, User } from "@/types";
 import type { ApiError } from "@/api/client";
 import { authApi } from "@/api/services/auth";
 import { toast } from "sonner";
-import { useState, type ChangeEvent, type FormEvent, type SyntheticEvent } from "react";
+import { useState, type ChangeEvent, type SyntheticEvent } from "react";
 
 export const SignUpForm = () => {
   const navigate = useNavigate()

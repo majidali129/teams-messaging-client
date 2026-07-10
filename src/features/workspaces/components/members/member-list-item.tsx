@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon, UserMinusIcon } from "lucide-react";
+import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,12 +31,11 @@ export const MemberListItem = ({ member, isSelf }: MemberListItemProps) => {
 
   const {mutate: createChat, isPending} = useMutation({
     mutationFn: () => chatsApi.create({
-      workspaceId,
+      workspaceId: workspaceId!,
       isChannel: false,
       participants: [member.userId],
     }),
     onSuccess: (data) => {
-      console.log(data);
       navigate(`/workspaces/${workspaceId}/chats?chat=${data.chatKey}`);
       setOpen(false);
     },

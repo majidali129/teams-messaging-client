@@ -1,8 +1,6 @@
-import { useParams } from "react-router";
+
 import { MailIcon, ShieldAlertIcon } from "lucide-react";
 import { Empty } from "@/components/shared/empty";
-import { CURRENT_USER_ID, getInvitesForWorkspace, getWorkspaceById } from "@/lib/mock-data";
-import { WorkspaceRole } from "@/types";
 import { InviteListItem } from "./invite-list-item";
 import { useWorkspace } from "../../hooks/use-workspace";
 import { useUser } from "@/features/auth/hooks/use-user";
@@ -11,7 +9,7 @@ export const WorkspaceInvitesTab = () => {
   const { workspace } = useWorkspace();
   const {user} = useUser();
 
-  const isOwner = workspace.owner.id === user.id
+  const isOwner = workspace!.owner!.id === user!.id
 
   if (!isOwner) {
     return (
@@ -25,12 +23,12 @@ export const WorkspaceInvitesTab = () => {
     );
   }
 
-  const invites = workspace.invites;
+  const invites = workspace!.invites;
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 sm:p-6">
       <h2 className="text-sm font-semibold text-muted-foreground">
-        {invites.length} invite{invites.length === 1 ? "" : "s"} sent
+        {invites!.length} invite{invites!.length === 1 ? "" : "s"} sent
       </h2>
 
       {invites.length === 0 ? (

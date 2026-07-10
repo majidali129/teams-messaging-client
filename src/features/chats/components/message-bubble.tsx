@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/message";
 import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/components/ui/bubble";
 import { getAvatar, getInitials } from "@/lib/utils";
-import { getMessageById, getUserById } from "@/lib/mock-data";
 import { MessageAttachmentType, MessageStatus, type Message as MessageType } from "@/types";
 import { useUser } from "@/features/auth/hooks/use-user";
 
@@ -28,7 +27,7 @@ export const MessageBubble = ({ message }: { message: MessageType }) => {
       <MessageAvatar>
         <Avatar size="lg" className="size-8">
           <AvatarImage src={getAvatar(sender?.name)} alt={sender?.name} />
-          <AvatarFallback>{sender ? getInitials(sender.name) : "?"}</AvatarFallback>
+          <AvatarFallback>{getInitials(sender.name)}</AvatarFallback>
         </Avatar>
       </MessageAvatar>
 

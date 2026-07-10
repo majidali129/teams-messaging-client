@@ -31,7 +31,7 @@ export const UserReceivedInvites = () => {
     })
 
     const renderLoader = () => isLoading? <LoadingState title="Loading your invites" description="Please wait while we load your invites" /> : null;
-    const renderFallback = () => !isLoading && data.invites.length === 0 ? <Empty title="No pending invites" description="You're all caught up." /> : null;
+    const renderFallback = () => !isLoading && data?.invites.length === 0 ? <Empty title="No pending invites" description="You're all caught up." /> : null;
     
     const {invites, total} = data ?? {invites: [], total: 0};
 

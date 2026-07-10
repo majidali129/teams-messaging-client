@@ -16,7 +16,7 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ chat, onBack }: ChatHeaderProps) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const {user} = useUser()  
-  const displayName = chat.isChannel? chat.name: chat.participants[1].name
+  const displayName = chat.isChannel? chat.name: chat.participants.find(p => p.id !== user!.id)?.name
 
   return (
     <div className="flex items-center gap-2 border-b p-3">
@@ -32,14 +32,14 @@ export const ChatHeader = ({ chat, onBack }: ChatHeaderProps) => {
         </div>
       ) : (
         <Avatar size="lg">
-          <AvatarImage src={getAvatar(displayName)} alt={displayName} />
-          <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
+          <AvatarImage src={getAvatar(displayName!)} alt={displayName!} />
+          <AvatarFallback>{getInitials(displayName!)}</AvatarFallback>
         </Avatar>
       )}
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="truncate text-sm font-semibold">{displayName}</span>
+          <span className="truncate text-sm font-semibold">{displayName!}</span>
           {chat.isChannel && (
             <Badge variant="outline" className="h-4 px-1 text-[10px]">
               channel
@@ -57,7 +57,7 @@ export const ChatHeader = ({ chat, onBack }: ChatHeaderProps) => {
 
       <ChatDetailsSheet
         chat={chat}
-        displayName={displayName}
+        displayName={displayName!}
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
       />

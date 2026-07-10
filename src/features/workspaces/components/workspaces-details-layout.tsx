@@ -23,6 +23,15 @@ export const WorkspaceDetailsLayout = () => {
     return <LoadingState className="h-full" />;
   }
 
+  if(!workspace) {
+    return <div className="flex h-full items-center justify-center">
+      <ErrorState
+        title="Workspace not found"
+        description="This workspace doesn't exist or you no longer have access to it."
+      />
+    </div>
+  }
+
   return (
     <div className="flex h-full flex-col">
       <WorkspaceDetailsHeader workspace={workspace} />

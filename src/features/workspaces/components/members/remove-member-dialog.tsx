@@ -8,14 +8,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { WorkspaceMemberWithUser } from "@/types";
+import type { WorkspaceMember } from "@/types";
 
 export const RemoveMemberDialog = ({
   member,
   open,
   onOpenChange,
 }: {
-  member: WorkspaceMemberWithUser;
+  member: WorkspaceMember;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
@@ -23,7 +23,7 @@ export const RemoveMemberDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove {member.user?.name}?</AlertDialogTitle>
+          <AlertDialogTitle>Remove {member.user.name}?</AlertDialogTitle>
           <AlertDialogDescription>
             They will lose access to this workspace, its chats, and shared content
             immediately.

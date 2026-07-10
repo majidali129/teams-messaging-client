@@ -53,7 +53,7 @@ export const useChatSocket = (chatKey: string | undefined) => {
                     total: old.total + 1
                 }
             });
-            queryClient.invalidateQueries({queryKey: queryKeys.chats.all(workspaceId)})
+            queryClient.invalidateQueries({queryKey: queryKeys.chats.all(workspaceId!)})
             queryClient.invalidateQueries({ queryKey: queryKeys.chats.details(chatKey) });
         };
 

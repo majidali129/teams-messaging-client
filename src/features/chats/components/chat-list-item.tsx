@@ -24,14 +24,13 @@ interface ChatListItemProps {
 export const ChatListItem = ({ chat, isActive, onSelect }: ChatListItemProps) => {
   const { user } = useUser();
 const otherUser = !chat.isChannel
-? chat.participants.find((p) => {
-    const pid = p.id ?? (p as { _id?: string })._id;
-    return pid !== user?.id;
-  })
+? chat.participants.find(p => p.id !== user!.id)
 : undefined;
+
 const displayName = chat.isChannel
 ? (chat.name ?? "Channel")
-: (otherUser?.name ?? "Direct message");
+: (otherUser?.name! ?? "Direct message");
+
 
   return (
     <button
@@ -45,14 +44,14 @@ const displayName = chat.isChannel
       {chat.isChannel ? (
         <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
          <Avatar>
-          <AvatarImage src={getAvatar(chat.name)} alt={chat.name} />
-          <AvatarFallback>{getInitials(chat.name)}</AvatarFallback>
+          <AvatarImage src={getAvatar(chat.name!)} alt={chat.name!} />
+          <AvatarFallback>{getInitials(chat.name!)}</AvatarFallback>
         </Avatar>
         </div>
       ) : (
         <Avatar>
-          <AvatarImage src={getAvatar(otherUser.name)} alt={otherUser.name} />
-          <AvatarFallback>{getInitials(otherUser.name)}</AvatarFallback>
+          <AvatarImage src={getAvatar(otherUser!.name)} alt={otherUser!.name} />
+          <AvatarFallback>{getInitials(otherUser!.name)}</AvatarFallback>
           <AvatarBadge className="bg-green-500" />
         </Avatar>
       )}
@@ -66,7 +65,7 @@ const displayName = chat.isChannel
             </Badge>
           )}
         </div>
-        <p className="truncate text-xs text-muted-foreground">{previewForMessage(chat, user)}</p>
+        <p className="truncate text-xs text-muted-foreground">{previewForMessage(chat, user! as User)}</p>
       </div>
     </button>
   );

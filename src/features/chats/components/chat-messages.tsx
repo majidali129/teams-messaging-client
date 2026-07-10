@@ -15,7 +15,7 @@ const formatDayLabel = (iso: string) =>
   });
 
 export const ChatMessages = ({ chatKey }: { chatKey: string }) => {
-  const {messages, total, isLoading, error} = useChatMessages(chatKey);
+  const {messages, isLoading, error} = useChatMessages(chatKey);
 
   const renderLoader = () => isLoading ? <LoadingState title="Loading messages" description="Please wait while we load the messages" /> : null;
   const renderError = () => !isLoading && error ? <ErrorState title="Failed to load messages" description="Please try again later" /> : null;

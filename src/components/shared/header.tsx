@@ -16,7 +16,6 @@ import { profilePath, settingsPath, signInPath } from "@/paths";
 import { useUser } from "@/features/auth/hooks/use-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import { UserReceivedInvites } from "./user-received-invites";
-import { socketInstance } from "@/sockets/instance";
 
 export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
   const { user } = useUser();

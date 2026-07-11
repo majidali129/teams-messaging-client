@@ -1,6 +1,7 @@
 import { authApi } from "@/api/services/auth"
 import { signInPath } from "@/paths";
 import { queryKeys } from "@/query-keys";
+import { socketInstance } from "@/sockets/instance";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -13,6 +14,9 @@ export const useLogout = () => {
         mutationFn: authApi.logout,
         onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: queryKeys.users.current })
+                localStorage.removeItem('access-token');
+                localStorage.removeItem('refresh-token');
+                socketInstance().disconnect();
                 toast.success('Logged out successfully')
                 setTimeout(() => navigate(signInPath()), 500)
         },

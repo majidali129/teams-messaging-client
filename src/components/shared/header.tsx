@@ -23,9 +23,6 @@ export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
   const {logout, isPending} = useLogout();
 
   const handleLogout =  () => {
-    localStorage.removeItem('access-token');
-    localStorage.removeItem('refresh-token');
-    socketInstance().disconnect();
     logout();
   }
 

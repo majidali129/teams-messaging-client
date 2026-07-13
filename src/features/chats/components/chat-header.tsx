@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeftIcon, HashIcon, InfoIcon } from "lucide-react";
+import { ArrowLeftIcon, HashIcon, InfoIcon, UsersIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { getAvatar, getInitials } from "@/lib/utils";
 import type { Chat } from "@/types";
 import { ChatDetailsSheet } from "./chat-details-sheet";
 import { useUser } from "@/features/auth/hooks/use-user";
+import { AddParticipantsToChannelDialog } from "./add-participants-to-channel-dialog";
 
 interface ChatHeaderProps {
   chat: Chat;
@@ -51,9 +52,20 @@ export const ChatHeader = ({ chat, onBack }: ChatHeaderProps) => {
         </p>
       </div>
 
+<div className="flex items-center gap-2">
+{chat.isChannel && <AddParticipantsToChannelDialog
+          chat={chat}
+          trigger={
+            <Button size="sm" variant="outline">
+              <UsersIcon />
+              Add participants
+            </Button>
+          }
+        />}
       <Button variant="ghost" size="icon" onClick={() => setDetailsOpen(true)} aria-label="Chat details">
         <InfoIcon />
       </Button>
+</div>
 
       <ChatDetailsSheet
         chat={chat}

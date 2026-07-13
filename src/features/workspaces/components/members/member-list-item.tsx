@@ -33,7 +33,7 @@ export const MemberListItem = ({ member, isSelf }: MemberListItemProps) => {
     mutationFn: () => chatsApi.create({
       workspaceId: workspaceId!,
       isChannel: false,
-      participants: [member.userId],
+      participants: [member.user.id],
     }),
     onSuccess: (data) => {
       navigate(`/workspaces/${workspaceId}/chats?chat=${data.chatKey}`);

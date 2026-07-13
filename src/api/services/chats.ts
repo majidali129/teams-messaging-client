@@ -8,4 +8,5 @@ export const chatsApi = {
     getOne: (chatKey: string) => httpClient.get<Chat>(`/chats/${chatKey}`),
     create: (input: CreateChatInput) => httpClient.post<Chat>('/chats',input),
     getMessages: (chatKey: string) => httpClient.get<{messages: Message[], total: number}>(`/chats/${chatKey}/messages`),
+    addParticipants: (chatId: string, participants: string[]) => httpClient.patch<Chat>(`/chats/${chatId}`, { participants }),
 }

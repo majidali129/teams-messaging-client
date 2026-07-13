@@ -3,7 +3,8 @@
 export const queryKeys = {
     workspaces: {
         all: ['workspaces'] as const,
-        details: (id: string) => ['workspaces', id] as const
+        details: (id: string) => ['workspaces', id] as const,
+        members: (id: string) => ['workspaces', id, 'members'] as const
     },
     chats: {
         all: (workspaceId: string) => ['chats', workspaceId] as const,
@@ -14,6 +15,7 @@ export const queryKeys = {
         current: ['users', 'current'] as const
     },
     invites: {
-        received: () => ['invites', 'received'] as const
+        received: () => ['invites', 'received'] as const,
+        all: (workspaceId: string) => ['invites', workspaceId] as const
     }
 }

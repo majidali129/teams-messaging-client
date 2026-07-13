@@ -11,9 +11,7 @@ import { useWorkspaces } from "../hooks/use-workspaces";
 
 export const WorkspacesAllPage = () => {
   const [view, setView] = useState<ViewMode>("grid");
-  const {workspaces, isLoading, error} = useWorkspaces()
-
-  console.log('workspaces: ',workspaces)
+  const {data: {workspaces, totalCount}, isLoading, error} = useWorkspaces()
 
   const renderLoader = () => {
     if(!isLoading) return null
@@ -36,7 +34,7 @@ export const WorkspacesAllPage = () => {
   };
 
   const renderContent = () => {
-    const hasData = workspaces && workspaces.length > 0;
+    const hasData = workspaces && totalCount > 0;
     
     if (isLoading || error !== null || !hasData) return null;
   

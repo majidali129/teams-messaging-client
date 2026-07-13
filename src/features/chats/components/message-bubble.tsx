@@ -17,22 +17,22 @@ const formatTime = (iso: string) =>
 
 export const MessageBubble = ({ message }: { message: MessageType }) => {
   const {user} = useUser()
-  const isOwn = message.senderId._id === user?.id;
-  const sender = message.senderId;
-  const replyTo = message.prevMessageId;
-  const replySender = replyTo ? replyTo.senderId : undefined;
+  const sender = message.sender;
+  const isOwn = sender.id === user?.id;
+  const replyTo = message.prevMessage;
+  const replySender = replyTo ? replyTo.sender : undefined;
 
   return (
     <Message align={isOwn ? "end" : "start"}>
       <MessageAvatar>
         <Avatar size="lg" className="size-8">
           <AvatarImage src={getAvatar(sender?.name)} alt={sender?.name} />
-          <AvatarFallback>{getInitials(sender.name)}</AvatarFallback>
+          <AvatarFallback>{getInitials(sender?.name)}</AvatarFallback>
         </Avatar>
       </MessageAvatar>
 
       <MessageContent>
-        <MessageHeader>{isOwn ? "You" : sender?.name}</MessageHeader>
+        <MessageHeader>{isOwn ? "You" : sender.name}</MessageHeader>
 
         <BubbleGroup>
           {replyTo && !message.isDeleted && (
@@ -54,7 +54,7 @@ export const MessageBubble = ({ message }: { message: MessageType }) => {
                 <span className="italic opacity-70">This message was removed</span>
               ) : (
                 <>
-                  {message.attachment?.map((attachment, index) =>
+                  {message.attachments?.map((attachment, index) =>
                     attachment.type === MessageAttachmentType.image ? (
                       <img
                         key={index}

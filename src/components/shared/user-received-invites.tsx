@@ -3,24 +3,26 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RoleBadge } from "./role-badge";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { inviteApi } from "@/api/services/invite";
+import { invitesApi } from "@/api/services/invite";
 import { queryKeys } from "@/query-keys";
 import { Badge } from "../ui/badge";
 import { Empty } from "./empty";
 import { LoadingState } from "./loading-state";
 import type { AcceptInviteInput } from "@/types";
 import { toast } from "sonner";
+import { useWorkspace } from "@/features/workspaces/hooks/use-workspace";
 
 
 export const UserReceivedInvites = () => {
+    const {workspace} = useWorkspace()
     const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
-        queryFn: () => inviteApi.getReceived(),
+        queryFn: () => invitesApi.getReceived(),
         queryKey: queryKeys.invites.received(),
     })
 
     const { mutate: respondToInvite, isPending } = useMutation({
-        mutationFn: ({ inviteId, input }: { inviteId: string, input: AcceptInviteInput }) => inviteApi.respond(inviteId, input),
+        mutationFn: ({ inviteId, input }: { inviteId: string, input: AcceptInviteInput }) => invitesApi.respond(inviteId, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invites.received() });
             toast.success('Action successful');
@@ -59,7 +61,7 @@ export const UserReceivedInvites = () => {
                                     <li key={invite.id} className="space-y-2 px-3 py-3">
                                         <div className="flex items-start justify-between gap-2">
                                             <div>
-                                                <p className="text-sm font-medium">{invite.workspaceId.name}</p>
+                                                <p className="text-sm font-medium">{workspace?.name}</p>
                                                 <p className="text-xs text-muted-foreground">
                                                     Invited by {invite.invitedBy.name} · as {invite.role}
                                                 </p>

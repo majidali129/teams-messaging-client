@@ -22,7 +22,7 @@ import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
 import { WorkspaceRole } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { inviteApi } from "@/api/services/invite";
+import { invitesApi } from "@/api/services/invite";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { queryKeys } from "@/query-keys";
@@ -37,7 +37,7 @@ export const InviteMemberDialog = ({ trigger }: { trigger: ReactElement }) => {
   })
 
   const {mutate: createInvite, isPending} = useMutation({
-    mutationFn: () => inviteApi.create(workspaceId as string, values),
+    mutationFn: () => invitesApi.create(workspaceId as string, values),
     onSuccess: () => {
       toast.success('Invite sent successfully')
       queryClient.invalidateQueries({ queryKey: queryKeys.invites.received() })

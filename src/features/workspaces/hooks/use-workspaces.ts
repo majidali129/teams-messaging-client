@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query"
 
 
 export const useWorkspaces = () => {
-    const {data: workspaces, isLoading, error} = useQuery({
+    const {data, isLoading, error} = useQuery({
         queryFn: workspaceApi.getAll,
         queryKey: queryKeys.workspaces.all
       })
 
-      return {workspaces, isLoading, error} as const
+      return {data: data ?? {workspaces: [], totalCount: 0}, isLoading, error} as const
 }

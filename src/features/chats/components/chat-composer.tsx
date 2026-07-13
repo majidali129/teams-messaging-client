@@ -54,7 +54,6 @@ export const ChatComposer = ({chatKey}: {chatKey: string}) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const content = formData.get('content') as string;
-    console.log(content)
     if(!content) return;
     sendMessage({
       chatKey,
@@ -63,7 +62,6 @@ export const ChatComposer = ({chatKey}: {chatKey: string}) => {
       mentions: []
     })
     emitStop();
-    // formData.delete('content')
     e.currentTarget.reset();
     fileInputRef.current = null;
   }

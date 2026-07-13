@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import {  UsersIcon } from "lucide-react";
+import { UsersIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 
 import { RoleBadge } from "@/components/shared/role-badge";
 import { getInitials } from "@/lib/utils";
@@ -12,8 +17,12 @@ import { WorkspaceStatus, type Workspace } from "@/types";
 import { EditWorkspaceDialog } from "./edit-workspace-dialog";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { useUser } from "@/features/auth/hooks/use-user";
+import { useWorkspaceMembers } from "../hooks/use-workspace-members";
 
-const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline"> = {
+const STATUS_VARIANT: Record<
+  WorkspaceStatus,
+  "default" | "secondary" | "outline"
+> = {
   [WorkspaceStatus.active]: "default",
   [WorkspaceStatus.archived]: "secondary",
   [WorkspaceStatus.deleted]: "outline",
@@ -21,7 +30,10 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 
 export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
   const { user } = useUser();
-  const myRole = workspace.members.find((m) => m.userId === user!.id)?.role;
+  const {
+    data: { members, totalCount },
+  } = useWorkspaceMembers(workspace.id);
+  const myRole = members.find((m) => m.user.id === user!.id)?.role;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -38,7 +50,10 @@ export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
           >
             {workspace.name}
           </Link>
-          <Badge variant={STATUS_VARIANT[workspace.status]} className="mt-1 capitalize">
+          <Badge
+            variant={STATUS_VARIANT[workspace.status]}
+            className="mt-1 capitalize"
+          >
             {workspace.status}
           </Badge>
         </div>
@@ -65,7 +80,7 @@ export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
       </CardHeader>
       <CardContent className="flex items-center gap-2 text-sm text-muted-foreground">
         <UsersIcon className="size-4" />
-        {workspace.members.length} member{workspace.members.length === 1 ? "" : "s"}
+        {totalCount} member{totalCount > 1 ? "s" : ""}
       </CardContent>
       {myRole && (
         <CardFooter>
@@ -74,7 +89,11 @@ export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
         </CardFooter>
       )}
 
-      <EditWorkspaceDialog workspace={workspace} open={editOpen} onOpenChange={setEditOpen} />
+      <EditWorkspaceDialog
+        workspace={workspace}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
       <DeleteWorkspaceDialog
         workspace={workspace}
         open={deleteOpen}

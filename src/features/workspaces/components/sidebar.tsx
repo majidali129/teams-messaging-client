@@ -1,5 +1,10 @@
 import { Link, NavLink } from "react-router";
-import { LayoutGridIcon, MessagesSquareIcon, PlusIcon, SettingsIcon } from "lucide-react";
+import {
+  LayoutGridIcon,
+  MessagesSquareIcon,
+  PlusIcon,
+  SettingsIcon,
+} from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn, getInitials } from "@/lib/utils";
@@ -11,10 +16,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SIDEBAR_WORKSPACE_LIMIT = 4;
 
 export const WorkspacesSidebarContent = () => {
-  const { workspaces, isLoading } = useWorkspaces()
+  const { data, isLoading } = useWorkspaces();
+
+  const { workspaces } = data ?? { workspaces: [], totalCount: 0 };
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <Link to={homePath()} className="flex items-center gap-2 border-b border-sidebar-border px-4 py-4">
+      <Link
+        to={homePath()}
+        className="flex items-center gap-2 border-b border-sidebar-border px-4 py-4"
+      >
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <MessagesSquareIcon className="size-4.5" />
         </div>
@@ -42,40 +52,43 @@ export const WorkspacesSidebarContent = () => {
           </div>
 
           <div>
-            {
-              isLoading ? (
-                <ul className="space-y-1">
-                  {Array.from({length: 2}).map((_, index) => (
-                    <li key={index}>
-                      <Skeleton className="h-10 w-full" />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul className="space-y-0.5">
-                  {workspaces?.slice(0, SIDEBAR_WORKSPACE_LIMIT).map((workspace) => (
-                    <li key={workspace.id}>
-                      <NavLink
-                        to={workspacePath(workspace.id)}
-                        className={({ isActive }) =>
-                          cn(
-                            "flex items-center gap-2.5 rounded-lg px-2 py-1 text-sm transition-colors",
-                            isActive
-                              ? "bg-primary/10 text-sidebar-accent-foreground font-medium"
-                              : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-                          )
-                        }
-                      >
-                        <Avatar size="default">
-                          <AvatarFallback>{getInitials(workspace.name)}</AvatarFallback>
-                        </Avatar>
-                        <span className="truncate">{workspace.name}</span>
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              )
-            }
+            {isLoading ? (
+              <ul className="space-y-1">
+                {Array.from({ length: 2 }).map((_, index) => (
+                  <li key={index}>
+                    <Skeleton className="h-10 w-full" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="space-y-0.5">
+                {!isLoading &&
+                  workspaces
+                    .slice(0, SIDEBAR_WORKSPACE_LIMIT)
+                    .map((workspace) => (
+                      <li key={workspace.id}>
+                        <NavLink
+                          to={workspacePath(workspace.id)}
+                          className={({ isActive }) =>
+                            cn(
+                              "flex items-center gap-2.5 rounded-lg px-2 py-1 text-sm transition-colors",
+                              isActive
+                                ? "bg-primary/10 text-sidebar-accent-foreground font-medium"
+                                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                            )
+                          }
+                        >
+                          <Avatar size="default">
+                            <AvatarFallback>
+                              {getInitials(workspace.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="truncate">{workspace.name}</span>
+                        </NavLink>
+                      </li>
+                    ))}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -86,7 +99,7 @@ export const WorkspacesSidebarContent = () => {
               "flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors",
               isActive
                 ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
             )
           }
         >
@@ -95,14 +108,17 @@ export const WorkspacesSidebarContent = () => {
           </span>
           View all workspaces
         </NavLink>
-      </nav >
+      </nav>
 
       <div className="border-t border-sidebar-border p-3">
-        <Button variant="ghost" className="w-full justify-start gap-2.5 text-sidebar-foreground/80">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2.5 text-sidebar-foreground/80"
+        >
           <SettingsIcon />
           Settings
         </Button>
       </div>
-    </div >
+    </div>
   );
 };

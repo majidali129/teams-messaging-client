@@ -46,7 +46,6 @@ export const SignUpForm = () => {
 
   const onSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(values);
     mutate(values)
   }
   return (

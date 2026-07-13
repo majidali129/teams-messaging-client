@@ -60,7 +60,10 @@ export const useChatSocket = (chatKey: string | undefined) => {
         socket.on(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
 
         if (socket.connected) joinRoom()
-        else socket.connect()
+        else {
+            socket.connect()
+            joinRoom()
+        }
 
         return () => {
             socket.emit(EVENTS.ROOM_LEAVE, { chatKey });

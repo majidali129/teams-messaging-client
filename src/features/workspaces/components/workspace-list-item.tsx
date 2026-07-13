@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { EyeIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import {
+  EyeIcon,
+  MoreVerticalIcon,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,8 +23,12 @@ import { WorkspaceStatus, type Workspace } from "@/types";
 import { EditWorkspaceDialog } from "./edit-workspace-dialog";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { useUser } from "@/features/auth/hooks/use-user";
+import { useWorkspaceMembers } from "../hooks/use-workspace-members";
 
-const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline"> = {
+const STATUS_VARIANT: Record<
+  WorkspaceStatus,
+  "default" | "secondary" | "outline"
+> = {
   [WorkspaceStatus.active]: "default",
   [WorkspaceStatus.archived]: "secondary",
   [WorkspaceStatus.deleted]: "outline",
@@ -27,7 +36,10 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 
 export const WorkspaceListItem = ({ workspace }: { workspace: Workspace }) => {
   const { user } = useUser();
-  const myRole = workspace.members.find((member) => member.userId === user?.id)?.role;
+  const {
+    data: { members, totalCount },
+  } = useWorkspaceMembers(workspace.id);
+  const myRole = members.find((member) => member.user.id === user!.id)?.role;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -45,11 +57,14 @@ export const WorkspaceListItem = ({ workspace }: { workspace: Workspace }) => {
           {workspace.name}
         </Link>
         <p className="text-xs text-muted-foreground">
-          {workspace.members.length} member{workspace.members.length === 1 ? "" : "s"}
+          {totalCount} member{totalCount > 1 ? "s" : ""}
         </p>
       </div>
 
-      <Badge variant={STATUS_VARIANT[workspace.status]} className="hidden capitalize sm:inline-flex">
+      <Badge
+        variant={STATUS_VARIANT[workspace.status]}
+        className="hidden capitalize sm:inline-flex"
+      >
         {workspace.status}
       </Badge>
 
@@ -69,14 +84,21 @@ export const WorkspaceListItem = ({ workspace }: { workspace: Workspace }) => {
             Edit
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setDeleteOpen(true)}
+          >
             <Trash2Icon />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditWorkspaceDialog workspace={workspace} open={editOpen} onOpenChange={setEditOpen} />
+      <EditWorkspaceDialog
+        workspace={workspace}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
       <DeleteWorkspaceDialog
         workspace={workspace}
         open={deleteOpen}

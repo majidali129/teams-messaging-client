@@ -5,7 +5,6 @@ import { useParams } from "react-router"
 
 export const useWorkspaceChats = () => {
     const {id: workspaceId} = useParams()
-    console.log(workspaceId);
     const {data, isLoading, error} = useQuery({
       queryFn: () => chatsApi.getAll(workspaceId!),
       queryKey: queryKeys.chats.all(workspaceId!),

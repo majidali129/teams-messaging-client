@@ -5,20 +5,26 @@ import { signInPath } from "@/paths";
 import { LoadingState } from "./loading-state";
 
 export const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useUser();
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useUser();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      navigate(signInPath());
+      navigate(signInPath(), { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
   if (isLoading)
-    <LoadingState
-      title="Checking your account..."
-      description="Please wait while we verify your credentials."
-    />;
+    return (
+      <LoadingState
+        title="Checking your account..."
+        description="Please wait while we verify your credentials."
+      />
+    );
 
-  if (isAuthenticated) return children;
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return children;
 };

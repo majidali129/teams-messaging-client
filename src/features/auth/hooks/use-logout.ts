@@ -14,6 +14,7 @@ export const useLogout = () => {
       queryClient.removeQueries();
       localStorage.removeItem("access-token");
       localStorage.removeItem("refresh-token");
+      localStorage.removeItem("user");
       socketInstance().disconnect();
       toast.success("Logged out successfully");
       navigate(signInPath(), { replace: true });

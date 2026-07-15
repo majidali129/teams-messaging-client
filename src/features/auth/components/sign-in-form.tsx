@@ -14,11 +14,12 @@ import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
 import { homePath, signUpPath } from "@/paths";
 import { useState, type ChangeEvent, type SyntheticEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "@/api/client";
-import type { SignInInput } from "@/types";
+import type { SignInInput, SignInResponse } from "@/types";
 import { authApi } from "@/api/services/auth";
 import { toast } from "sonner";
+import { queryKeys } from "@/query-keys";
 
 export const SignInForm = () => {
   const navigate = useNavigate()
@@ -30,15 +31,16 @@ export const SignInForm = () => {
     const {name, value} = e.target;
     setValues(prev => ({...prev, [name]: value}))
   }
-  const {mutate, isPending} = useMutation<{accessToken: string , refreshToken: string},ApiError, SignInInput>({
+  const queryClient = useQueryClient()
+  const {mutate, isPending} = useMutation<SignInResponse,ApiError, SignInInput>({
     mutationFn: authApi.signIn,
     onSuccess: (data) => {
       toast.success('Login successfully')
-      localStorage.setItem('access-token', data.accessToken)
-      localStorage.setItem('refresh-token', data.refreshToken!)
-      setTimeout(() => {
+        localStorage.setItem('access-token', data.accessToken)
+        localStorage.setItem('refresh-token', data.refreshToken)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        queryClient.setQueryData(queryKeys.users.current, data.user)
         navigate(homePath())
-      }, 800)
     },
     onError: (err) => {
       toast.error(err.message)

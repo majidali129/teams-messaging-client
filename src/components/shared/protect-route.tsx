@@ -1,29 +1,20 @@
-import { useUser } from "@/features/auth/hooks/use-user";
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { signInPath } from "@/paths";
-import { LoadingState } from "./loading-state";
 
 export const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useUser();
+  const isAuthenticated = !!localStorage.getItem('access-token')
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (!isAuthenticated || !user) {
       navigate(signInPath(), { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
-  if (isLoading)
-    return (
-      <LoadingState
-        title="Checking your account..."
-        description="Please wait while we verify your credentials."
-        fullPage
-      />
-    );
-
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return null;
   }
 

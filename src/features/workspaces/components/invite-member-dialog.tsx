@@ -26,10 +26,12 @@ import { invitesApi } from "@/api/services/invite";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { queryKeys } from "@/query-keys";
+import { useWorkspace } from "../hooks/use-workspace";
 
 export const InviteMemberDialog = ({ trigger }: { trigger: ReactElement }) => {
   const queryClient = useQueryClient()  
   const {id: workspaceId} = useParams()
+  const {workspace} = useWorkspace();
   const [open, setOpen] = useState(false)
   const [values, setValues] = useState<{email: string, role: WorkspaceRole}>({
     email: '',
@@ -37,7 +39,7 @@ export const InviteMemberDialog = ({ trigger }: { trigger: ReactElement }) => {
   })
 
   const {mutate: createInvite, isPending} = useMutation({
-    mutationFn: () => invitesApi.create(workspaceId as string, values),
+    mutationFn: () => invitesApi.create(workspaceId as string, {email: values.email, role: values.role, roomKey: workspace!.roomKey}),
     onSuccess: () => {
       toast.success('Invite sent successfully')
       queryClient.invalidateQueries({ queryKey: queryKeys.invites.received() })

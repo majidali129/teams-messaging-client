@@ -19,4 +19,6 @@ export const workspaceApi = {
   remove: (id: string) => httpClient.delete<void>(`/workspaces/${id}`),
   getMembers: (id: string) =>
     httpClient.get<WorkspaceMembers>(`/workspaces/${id}/members`),
+  removeMember: (id: string , memberId: string) =>
+    httpClient.delete<Workspace>(`/workspaces/${id}/members/${memberId}`),
 };

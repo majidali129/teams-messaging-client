@@ -4,6 +4,7 @@ import type {
   InviteStatus,
   MessageStatus,
   MessageAttachmentType,
+  MessageType,
 } from "./enums";
 
 export * from "./enums";
@@ -87,6 +88,7 @@ export type Workspaces = {
 export type WorkspaceDetails = {
   id: string;
   name: string;
+  roomKey: string;
   status: WorkspaceStatus;
   userRole: WorkspaceRole;
   owner: User;
@@ -106,6 +108,7 @@ export type WorkspaceMembers = {
 export interface CreateInviteInput {
   email: string;
   role: WorkspaceRole;
+  roomKey: string;
 }
 
 export interface AcceptInviteInput {
@@ -187,9 +190,19 @@ export interface SendMessageInput {
   attachments?: MessageAttachment[]
 }
 
+export interface EditMessageInput extends SendMessageInput {
+  messageId: string;
+}
+
+export interface DeleteMessageInput {
+  messageId: string;
+  chatKey: string;
+}
+
 export type Message = {
   id: string;
   content: string;
+  type: MessageType;
   sender: User;
   attachments?: MessageAttachment[];
   readBy?: User[];
@@ -200,6 +213,7 @@ export type Message = {
   chatKey: string;
   reactions?: string[];
   mentions?: Pick<User, 'id' | 'name'>[];
+  addedUsers?: User[];
   prevMessage?: MessagePreview & {
     isDeleted: boolean;
     sender: User;

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Loader2Icon, LogOutIcon, MenuIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { Loader2Icon, LogOutIcon, MenuIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getAvatar, getInitials } from "@/lib/utils";
-import { profilePath, settingsPath, signInPath } from "@/paths";
+import { profilePath, signInPath } from "@/paths";
 import { useUser } from "@/features/auth/hooks/use-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import { UserReceivedInvites } from "./user-received-invites";
@@ -66,10 +66,6 @@ export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
             <DropdownMenuItem render={<Link to={profilePath()} />}>
               <UserIcon />
               Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link to={settingsPath()} />}>
-              <SettingsIcon />
-              Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onClick={handleLogout} disabled={isPending}>

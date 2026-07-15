@@ -2,35 +2,24 @@ import { BellIcon, Loader2, LoaderCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RoleBadge } from "./role-badge";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { invitesApi } from "@/api/services/invite";
 import { queryKeys } from "@/query-keys";
 import { Badge } from "../ui/badge";
 import { Empty } from "./empty";
 import { LoadingState } from "./loading-state";
-import type { AcceptInviteInput } from "@/types";
-import { toast } from "sonner";
 import { useWorkspace } from "@/features/workspaces/hooks/use-workspace";
+import { useResponseToInvite } from "@/features/workspaces/hooks/use-response-to-invite";
 
 
 export const UserReceivedInvites = () => {
     const {workspace} = useWorkspace()
-    const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
         queryFn: () => invitesApi.getReceived(),
         queryKey: queryKeys.invites.received(),
     })
 
-    const { mutate: respondToInvite, isPending } = useMutation({
-        mutationFn: ({ inviteId, input }: { inviteId: string, input: AcceptInviteInput }) => invitesApi.respond(inviteId, input),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.invites.received() });
-            toast.success('Action successful');
-        },
-        onError: () => {
-            toast.error('Something went wrong');
-        },
-    })
+    const { respondToInvite, isPending } = useResponseToInvite(workspace?.id as string)
 
     const renderLoader = () => isLoading? <LoadingState title="Loading your invites" description="Please wait while we load your invites" /> : null;
     const renderFallback = () => !isLoading && data?.invites.length === 0 ? <Empty title="No pending invites" description="You're all caught up." /> : null;

@@ -8,8 +8,9 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import { Toaster } from "sonner";
 
 const queryClient = new QueryClient()
+
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <App />
@@ -17,5 +18,5 @@ createRoot(document.getElementById("root")!).render(
         <Toaster position="top-right" expand richColors closeButton />
       </QueryClientProvider>
     </BrowserRouter>
-  </StrictMode>,
+  // </StrictMode>,
 );

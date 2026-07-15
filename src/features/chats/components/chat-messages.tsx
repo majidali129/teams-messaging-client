@@ -6,6 +6,8 @@ import { MessageBubble } from "./message-bubble";
 import { useChatMessages } from "../hooks/use-chat-messages";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
+import type { DeleteMessageInput } from "@/types";
+import type { MessageEditedPayload } from "@/sockets/types";
 
 const formatDayLabel = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, {
@@ -14,7 +16,13 @@ const formatDayLabel = (iso: string) =>
     day: "numeric",
   });
 
-export const ChatMessages = ({ chatKey }: { chatKey: string }) => {
+interface ChatMessagesProps {
+  chatKey: string;
+  editMessage: (input: MessageEditedPayload) => void;
+  deleteMessage: (input: DeleteMessageInput) => void;
+}
+
+export const ChatMessages = ({ chatKey, editMessage, deleteMessage }: ChatMessagesProps) => {
   const {messages, isLoading, error} = useChatMessages(chatKey);
 
   const renderLoader = () => isLoading ? <LoadingState title="Loading messages" description="Please wait while we load the messages" /> : null;
@@ -46,7 +54,7 @@ export const ChatMessages = ({ chatKey }: { chatKey: string }) => {
                   <div className="h-px flex-1 bg-border" />
                 </div>
               )}
-              <MessageBubble message={message} />
+              <MessageBubble message={message} editMessage={editMessage} deleteMessage={deleteMessage} />
             </Fragment>
           );
         })}

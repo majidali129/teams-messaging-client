@@ -3,11 +3,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 /** Full-area loading indicator — e.g. for a page or tab panel. */
-export function LoadingState({ className, title, description }: { className?: string, title?: string, description?: string }) {
+export function LoadingState({ className, title, description, fullPage = false }: { className?: string, title?: string, description?: string, fullPage?: boolean }) {
   return (
-    <div className={cn("flex flex-1 flex-col items-center justify-center gap-3 py-16", className)}>
+    <div className={cn("flex flex-1 flex-col items-center justify-center gap-3 py-16", className, fullPage && "h-screen")}>
       <Spinner className="size-6 text-muted-foreground" />
-      <p className="text-sm text-muted-foreground">{title || "Loading…"}</p>
+      <p className="text-xl text-muted-foreground">{title || "Loading…"}</p>
       <p className="text-sm text-muted-foreground">{description || "Please wait while we load the content"}</p>
     </div>
   );

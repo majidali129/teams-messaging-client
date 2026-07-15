@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon } from "lucide-react";
+import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon, UserMinusIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RoleBadge } from "@/components/shared/role-badge";
 import { getAvatar, getInitials } from "@/lib/utils";
 import { MemberDetailsDialog } from "./member-details-dialog";
-import type { WorkspaceMember } from "@/types";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router";
-import { chatsApi } from "@/api/services/chats";
-import { toast } from "sonner";
+import { WorkspaceRole, type WorkspaceMember } from "@/types";
+import { RemoveMemberDialog } from "./remove-member-dialog";
+import { useCreateChat } from "../../hooks/use-create-chat";
 
 interface MemberListItemProps {
   member: WorkspaceMember;
@@ -23,26 +22,12 @@ interface MemberListItemProps {
   isSelf: boolean;
 }
 
-export const MemberListItem = ({ member, isSelf }: MemberListItemProps) => {
+export const MemberListItem = ({ member, isSelf, canManage }: MemberListItemProps) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate()
-  const {id: workspaceId} = useParams()
+  const [removeOpen, setRemoveOpen] = useState(false);
 
-  const {mutate: createChat, isPending} = useMutation({
-    mutationFn: () => chatsApi.create({
-      workspaceId: workspaceId!,
-      isChannel: false,
-      participants: [member.user.id],
-    }),
-    onSuccess: (data) => {
-      navigate(`/workspaces/${workspaceId}/chats?chat=${data.chatKey}`);
-      setOpen(false);
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  })
+  const {createChat, isPending: isCreatingChat} = useCreateChat(member.user.id);
 
 
   const user = member.user;
@@ -70,31 +55,30 @@ export const MemberListItem = ({ member, isSelf }: MemberListItemProps) => {
         <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
           <MoreVerticalIcon />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem onClick={() => setDetailsOpen(true)}>
             <EyeIcon />
             View details
           </DropdownMenuItem>
           {!isSelf && (
-            <DropdownMenuItem disabled={isPending} onClick={() => createChat()}>
-              {isPending ? <Loader2Icon className="size-4 animate-spin" /> : <MessageCircleIcon className="size-4" />}
+            <DropdownMenuItem disabled={isCreatingChat} onClick={() => createChat()}>
+              {isCreatingChat ? <Loader2Icon className="size-4 animate-spin" /> : <MessageCircleIcon className="size-4" />}
               Message
             </DropdownMenuItem>
           )}
-          {/* {canManage && !isSelf && member.role !== WorkspaceRole.owner && (
+          {canManage && !isSelf && member.role !== WorkspaceRole.owner && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={() => setRemoveOpen(true)}>
-                <UserMinusIcon />
                 Remove from workspace
               </DropdownMenuItem>
             </>
-          )} */}
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
       <MemberDetailsDialog member={member} open={detailsOpen} onOpenChange={setDetailsOpen} />
-      {/* <RemoveMemberDialog member={member} open={removeOpen} onOpenChange={setRemoveOpen} /> */}
+      <RemoveMemberDialog member={member} open={removeOpen} onOpenChange={setRemoveOpen} />
     </div>
   );
 };

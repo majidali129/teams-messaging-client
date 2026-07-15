@@ -1,8 +1,8 @@
 
 import { queryKeys } from "@/query-keys";
 import { socketInstance } from "@/sockets/instance";
-import { EVENTS, type TypingUpdatePayload } from "@/sockets/types";
-import type { Message, SendMessageInput } from "@/types";
+import { EVENTS, type MessageEditedPayload, type SendMessagePayload, type TypingUpdatePayload } from "@/sockets/types";
+import type { Message, DeleteMessageInput } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -23,7 +23,7 @@ export const useChatSocket = (chatKey: string | undefined) => {
         if (!chatKey) return;
 
         const socket = socketInstance()
-        const joinRoom = () => {
+        const joinChatRoom = () => {
             socket.emit(EVENTS.ROOM_JOIN, { chatKey })
         }
 
@@ -40,8 +40,6 @@ export const useChatSocket = (chatKey: string | undefined) => {
             })
         }
 
-        socket.on(EVENTS.TYPING_UPDATE, onTyping)
-
         const onMsgReceive = (message: Message) => {
             if (message.chatKey !== chatKey) return;
 
@@ -53,31 +51,84 @@ export const useChatSocket = (chatKey: string | undefined) => {
                     total: old.total + 1
                 }
             });
-            queryClient.invalidateQueries({queryKey: queryKeys.chats.all(workspaceId!)})
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) })
             queryClient.invalidateQueries({ queryKey: queryKeys.chats.details(chatKey) });
         };
 
-        socket.on(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
+        const onMsgEdit = (message: Message) => {
+            if (message.chatKey !== chatKey) return;
+            queryClient.setQueryData<MessagesChache>(queryKeys.chats.messages(chatKey), (old) => {
+                if (!old) return { messages: [message], total: 1 }
+                const index = old.messages.findIndex(m => m.id === message.id);
+                if (index !== -1) {
+                    const updatedMessages = [...old.messages];
+                    updatedMessages[index] = message;
+                    return {
+                        messages: updatedMessages,
+                        total: old.total
+                    }
+                }
+                return old;
+            })
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) });
+        }
 
-        if (socket.connected) joinRoom()
+        const onMsgDelete = (message: Message) => {
+            console.log('onMsgDelete', message);
+            if(message.chatKey !== chatKey) return;
+            queryClient.setQueryData<MessagesChache>(queryKeys.chats.messages(chatKey), (old) => {
+                if(!old) return { messages: [message], total: 1 }
+                const index = old.messages.findIndex(m => m.id === message.id);
+                if(index !== -1) {
+                    const updatedMessages = [...old.messages];
+                    updatedMessages[index] = message;
+                    return {
+                        messages: updatedMessages,
+                        total: old.total
+                    }
+                }
+                return old;
+            })
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) });
+        }
+
+        socket.on(EVENTS.TYPING_UPDATE, onTyping)
+        socket.on(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
+        socket.on(EVENTS.MESSAGE_EDITED, onMsgEdit)
+        socket.on(EVENTS.MESSAGE_DELETED, onMsgDelete)
+
+        if (socket.connected) joinChatRoom()
         else {
             socket.connect()
-            joinRoom()
+            joinChatRoom()
         }
 
         return () => {
             socket.emit(EVENTS.ROOM_LEAVE, { chatKey });
             socket.off(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
+            socket.off(EVENTS.MESSAGE_EDITED, onMsgEdit)
+            socket.off(EVENTS.MESSAGE_DELETED, onMsgDelete)
             socket.off(EVENTS.TYPING_UPDATE, onTyping)
             socket.emit(EVENTS.TYPING_STOP, { chatKey })
         }
 
     }, [chatKey, queryClient])
 
-    const sendMessage = (input: SendMessageInput) => {
+    const sendMessage = (input: SendMessagePayload) => {
         const socket = socketInstance()
         if (!socket.connected) socket.connect()
         socket.emit(EVENTS.MESSAGE_SEND, input)
     }
-    return { sendMessage, typingUsers }
+
+    const editMessage = (input: MessageEditedPayload) => {
+        const socket = socketInstance()
+        if(!socket.connected) socket.connect()
+        socket.emit(EVENTS.MESSAGE_EDITED, input)
+    }
+    const deleteMessage = (input: DeleteMessageInput) => {
+        const socket = socketInstance()
+        if(!socket.connected) socket.connect()
+        socket.emit(EVENTS.MESSAGE_DELETED, input)
+    }
+    return { sendMessage, editMessage, typingUsers, deleteMessage }
 }

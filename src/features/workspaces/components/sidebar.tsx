@@ -3,7 +3,6 @@ import {
   LayoutGridIcon,
   MessagesSquareIcon,
   PlusIcon,
-  SettingsIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -109,16 +108,6 @@ export const WorkspacesSidebarContent = () => {
           View all workspaces
         </NavLink>
       </nav>
-
-      <div className="border-t border-sidebar-border p-3">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-2.5 text-sidebar-foreground/80"
-        >
-          <SettingsIcon />
-          Settings
-        </Button>
-      </div>
     </div>
   );
 };

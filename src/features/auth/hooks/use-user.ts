@@ -7,12 +7,14 @@ export const useUser = () => {
     const {data, isLoading, error} = useQuery({
         queryKey: queryKeys.users.current,
         queryFn: () => usersApi.getCurrentUser(),
-    })
+        retry: false,
+    },
+)
 
     return {
-        user: data ?? null,
-        isAuthenticated: !!data,
+        isAuthenticated: !!data && !error,
         isLoading,
         error,
+        user: data,
     }
 }

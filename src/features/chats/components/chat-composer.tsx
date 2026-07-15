@@ -3,16 +3,20 @@ import { PaperclipIcon, SendIcon, SmileIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useChatSocket } from "../../../sockets/use-chat-socket";
 import { socketInstance } from "@/sockets/instance";
-import { EVENTS } from "@/sockets/types";
+import { EVENTS, type SendMessagePayload } from "@/sockets/types";
 import { useUser } from "@/features/auth/hooks/use-user";
 
 const QUICK_EMOJIS = ["😀", "😂", "😍", "👍", "🙏", "🎉", "🔥", "👀", "✅", "❤️", "😢", "🤔"];
 
-export const ChatComposer = ({chatKey}: {chatKey: string}) => {
+interface ChatComposerProps {
+  chatKey: string;
+  sendMessage: (input: SendMessagePayload) => void;
+  typingUsers: Map<string, string>
+}
+
+export const ChatComposer = ({chatKey, sendMessage, typingUsers}: ChatComposerProps) => {
   const { user } = useUser();
- const {sendMessage, typingUsers} =  useChatSocket(chatKey)
   const fileInputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false)

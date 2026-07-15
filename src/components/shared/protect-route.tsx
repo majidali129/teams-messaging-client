@@ -19,6 +19,7 @@ export const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
       <LoadingState
         title="Checking your account..."
         description="Please wait while we verify your credentials."
+        fullPage
       />
     );
 

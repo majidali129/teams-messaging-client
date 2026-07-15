@@ -1,4 +1,4 @@
-import type { Chat, CreateChatInput, Message } from "@/types";
+import type { Chat, CreateChatInput, DeleteMessageInput, Message } from "@/types";
 import { httpClient } from "../client";
 
 
@@ -9,4 +9,5 @@ export const chatsApi = {
     create: (input: CreateChatInput) => httpClient.post<Chat>('/chats',input),
     getMessages: (chatKey: string) => httpClient.get<{messages: Message[], total: number}>(`/chats/${chatKey}/messages`),
     addParticipants: (chatId: string, participants: string[]) => httpClient.patch<Chat>(`/chats/${chatId}`, { participants }),
+    deleteMessage: (input: DeleteMessageInput) => httpClient.patch<Message>(`/messages/${input.messageId}`, input),
 }

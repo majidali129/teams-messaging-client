@@ -9,6 +9,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { WorkspaceMember } from "@/types";
+import { useRemoveMember } from "../../hooks/use-remove-member";
+import { Loader2Icon, UserMinusIcon } from "lucide-react";
 
 export const RemoveMemberDialog = ({
   member,
@@ -19,6 +21,7 @@ export const RemoveMemberDialog = ({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
+  const { removeMember, isPending: isRemovingMember } = useRemoveMember();
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -31,7 +34,12 @@ export const RemoveMemberDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">Remove member</AlertDialogAction>
+          <AlertDialogAction variant="destructive"
+            onClick={() => removeMember(member.user.id)}
+            disabled={isRemovingMember}>
+            {isRemovingMember ? <Loader2Icon className="size-4 animate-spin" /> : <UserMinusIcon />}
+            Remove member
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

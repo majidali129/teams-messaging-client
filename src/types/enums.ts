@@ -37,6 +37,13 @@ export const MessageStatus = {
 } as const;
 export type MessageStatus = (typeof MessageStatus)[keyof typeof MessageStatus];
 
+// Mirrors api/src/chats/constants/message-type.ts
+export const MessageType = {
+  system: "system",
+  user: "user",
+} as const;
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
+
 // Mirrors api/src/chats/constants/message-attachment.ts
 export const MessageAttachmentType = {
   image: "image",
@@ -46,3 +53,9 @@ export const MessageAttachmentType = {
 } as const;
 export type MessageAttachmentType =
   (typeof MessageAttachmentType)[keyof typeof MessageAttachmentType];
+
+export const DeleteMessage = {
+  owner: 'owner',
+  everyone: 'everyone',
+} as const;
+export type DeleteMessageType = (typeof DeleteMessage)[keyof typeof DeleteMessage];

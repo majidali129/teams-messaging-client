@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import {
   Card,
   CardContent,
@@ -12,42 +12,53 @@ import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
-import { onboardingPath, signInPath } from "@/paths";
+import { signInPath, signInWithReturnPath } from "@/paths";
 import { useMutation } from "@tanstack/react-query";
 import type { SignUpInput, User } from "@/types";
 import type { ApiError } from "@/api/client";
 import { authApi } from "@/api/services/auth";
 import { toast } from "sonner";
-import { useState, type ChangeEvent, type SyntheticEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type SyntheticEvent } from "react";
+import { getSafeReturnTo } from "@/lib/safe-return-to";
 
 export const SignUpForm = () => {
-  const navigate = useNavigate()
-      const [values,setValues] = useState({
-    name: '',
-    email: '',
-    password: ''
-  })
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
+  const prefilledEmail = searchParams.get("email") ?? "";
+
+  const [values, setValues] = useState({
+    name: "",
+    email: prefilledEmail,
+    password: "",
+  });
+
+  const signInHref = useMemo(() => {
+    if (returnTo) return signInWithReturnPath(returnTo, prefilledEmail || values.email);
+    return signInPath();
+  }, [returnTo, prefilledEmail, values.email]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setValues(prev => ({...prev, [name]: value}))
-  }
-  const {mutate, isPending} = useMutation<User,ApiError, SignUpInput>({
+    const { name, value } = e.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+  const { mutate, isPending } = useMutation<User, ApiError, SignUpInput>({
     mutationFn: authApi.signUp,
     onSuccess: () => {
-      toast.success('Account created successfully')
+      toast.success("Account created successfully");
       setTimeout(() => {
-        navigate(signInPath())
-      }, 2000)
+        navigate(signInHref, { replace: true });
+      }, 1500);
     },
     onError: (err) => {
-      toast.error(err.message)
-    }
-  })
+      toast.error(err.message);
+    },
+  });
 
   const onSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    mutate(values)
-  }
+    e.preventDefault();
+    mutate(values);
+  };
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -55,7 +66,7 @@ export const SignUpForm = () => {
         <CardDescription>Start collaborating with your team in minutes.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" onSubmit={(onSubmit)}>
+        <form className="space-y-4" onSubmit={onSubmit}>
           <FormError error={undefined} />
 
           <div>
@@ -106,20 +117,12 @@ export const SignUpForm = () => {
           </div>
 
           <SubmitButton disabled={isPending} label="Create account" className="w-full" />
-
-          <p className="text-center text-xs text-muted-foreground">
-            After signup you&apos;ll go to{" "}
-            <Link to={onboardingPath()} className="font-medium text-primary hover:underline">
-              onboarding
-            </Link>
-            .
-          </p>
         </form>
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link to={signInPath()} className="font-medium text-primary hover:underline">
+          <Link to={signInHref} className="font-medium text-primary hover:underline">
             Sign in
           </Link>
         </p>

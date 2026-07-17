@@ -121,12 +121,36 @@ export interface AcceptInviteInput {
   status: 'accepted' | 'declined';
 }
 
+export interface AcceptInviteResponse {
+  workspaceId: string;
+}
+
+export interface InvitePreview {
+  inviteId: string;
+  email: string;
+  role: WorkspaceRole;
+  expiresAt: string;
+  workspace: {
+    id: string;
+    name: string;
+  };
+  invitedBy: {
+    name: string;
+  };
+}
+
+export interface InviteWorkspaceRef {
+  id: string;
+  name: string;
+}
+
 export interface Invite {
   id: string;
   email: string;
   role: WorkspaceRole;
   status: InviteStatus;
   invitedBy: User;
+  workspaceId?: InviteWorkspaceRef;
   expiresAt: Date;
   acceptedAt?: Date | null;
   createdAt: Date;

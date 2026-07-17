@@ -15,7 +15,6 @@ import { getAvatar, getInitials } from "@/lib/utils";
 import { profilePath, signInPath } from "@/paths";
 import { useUser } from "@/features/auth/hooks/use-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { UserReceivedInvites } from "./user-received-invites";
 
 export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
   const { user } = useUser();
@@ -40,7 +39,7 @@ export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
       </div>
 
       <div className="flex items-center gap-3.5">
-      <UserReceivedInvites />
+      {/* <UserReceivedInvites /> */}
 
         {user ? (
           <DropdownMenu>

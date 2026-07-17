@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import {
   Card,
   CardContent,
@@ -12,45 +12,56 @@ import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
-import { homePath, signUpPath } from "@/paths";
-import { useState, type ChangeEvent, type SyntheticEvent } from "react";
+import { homePath, signUpPath, signUpWithReturnPath } from "@/paths";
+import { useState, type ChangeEvent, type SyntheticEvent, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "@/api/client";
 import type { SignInInput, SignInResponse } from "@/types";
 import { authApi } from "@/api/services/auth";
 import { toast } from "sonner";
 import { queryKeys } from "@/query-keys";
+import { getSafeReturnTo } from "@/lib/safe-return-to";
 
 export const SignInForm = () => {
-  const navigate = useNavigate()
-      const [values,setValues] = useState({
-    email: '',
-    password: ''
-  })
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
+  const prefilledEmail = searchParams.get("email") ?? "";
+
+  const [values, setValues] = useState({
+    email: prefilledEmail,
+    password: "",
+  });
+
+  const signUpHref = useMemo(() => {
+    if (returnTo) return signUpWithReturnPath(returnTo, prefilledEmail || values.email);
+    return signUpPath();
+  }, [returnTo, prefilledEmail, values.email]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setValues(prev => ({...prev, [name]: value}))
-  }
-  const queryClient = useQueryClient()
-  const {mutate, isPending} = useMutation<SignInResponse,ApiError, SignInInput>({
+    const { name, value } = e.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation<SignInResponse, ApiError, SignInInput>({
     mutationFn: authApi.signIn,
     onSuccess: (data) => {
-      toast.success('Login successfully')
-        localStorage.setItem('access-token', data.accessToken)
-        localStorage.setItem('refresh-token', data.refreshToken)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        queryClient.setQueryData(queryKeys.users.current, data.user)
-        navigate(homePath())
+      toast.success("Login successfully");
+      localStorage.setItem("access-token", data.accessToken);
+      localStorage.setItem("refresh-token", data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      queryClient.setQueryData(queryKeys.users.current, data.user);
+      navigate(returnTo ?? homePath(), { replace: true });
     },
     onError: (err) => {
-      toast.error(err.message)
-    }
-  })
+      toast.error(err.message);
+    },
+  });
 
   const onSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    mutate(values)
-  }
+    e.preventDefault();
+    mutate(values);
+  };
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -79,12 +90,6 @@ export const SignInForm = () => {
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              {/* <Link
-                to={forgotPasswordPath()}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Forgot password?
-              </Link> */}
             </div>
             <Input
               id="password"
@@ -105,7 +110,7 @@ export const SignInForm = () => {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link to={signUpPath()} className="font-medium text-primary hover:underline">
+          <Link to={signUpHref} className="font-medium text-primary hover:underline">
             Create one
           </Link>
         </p>

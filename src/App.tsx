@@ -7,6 +7,7 @@ import { ResetPasswordForm } from "./features/auth/components/reset-password-for
 import { VerifyEmailForm } from "./features/auth/components/verify-email-form";
 import { UpdatePasswordForm } from "./features/auth/components/update-password-form";
 import { OnboardingPage } from "./features/onboarding/components/onboarding-page";
+import { InviteAcceptPage } from "./features/invites/components/invite-accept-page";
 import { AppLayout } from "./components/shared/app-layout";
 import { WorkspacesIndexPage } from "./features/workspaces/components/workspaces-index-page";
 import { WorkspacesAllPage } from "./features/workspaces/components/workspaces-all-page";
@@ -30,6 +31,7 @@ function App() {
       </Route>
 
       <Route path="on-boarding" element={<OnboardingPage />} />
+      <Route path="invites/accept" element={<InviteAcceptPage />} />
 
       <Route element={<ProtectRoute><AppLayout /></ProtectRoute>}>
         <Route index element={<Navigate to="/workspaces" replace />} />

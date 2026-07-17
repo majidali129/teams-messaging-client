@@ -9,6 +9,22 @@ export const updatePasswordPath = () => "/auth/update-password";
 // Onboarding
 export const onboardingPath = () => "/on-boarding";
 
+// Invites
+export const inviteAcceptPath = (token: string, inviteId: string) =>
+  `/invites/accept?token=${encodeURIComponent(token)}&inviteId=${encodeURIComponent(inviteId)}`;
+
+export const signInWithReturnPath = (returnTo: string, email?: string) => {
+  const params = new URLSearchParams({ returnTo });
+  if (email) params.set('email', email);
+  return `${signInPath()}?${params.toString()}`;
+};
+
+export const signUpWithReturnPath = (returnTo: string, email?: string) => {
+  const params = new URLSearchParams({ returnTo });
+  if (email) params.set('email', email);
+  return `${signUpPath()}?${params.toString()}`;
+};
+
 // Workspaces
 export const homePath = () => "/";
 export const workspacesPath = () => "/workspaces";

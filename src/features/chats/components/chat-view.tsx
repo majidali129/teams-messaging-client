@@ -15,19 +15,21 @@ interface ChatViewProps {
 
 export const ChatView = ({ chatKey, onBack }: ChatViewProps) => {
   const { chat, isLoading: isLoadingChat, error: errorChat } = useChat(chatKey);
-  const {sendMessage, typingUsers, editMessage, deleteMessage} = useChatSocket(chatKey)
+  const {sendMessage, typingUsers, editMessage, deleteMessage, emitReadMessage} = useChatSocket(chatKey)
 
   const renderLoader = () => isLoadingChat ? <LoadingState title="Loading chat" description="Please wait while we load the chat" /> : null;
   const renderError = () => !isLoadingChat && errorChat ? <ErrorState title="Failed to load chat" description="Please try again later" /> : null;
   const renderChat = () => !isLoadingChat && !errorChat && chat ? (
     <>
       <ChatHeader chat={chat} onBack={onBack} />
-      <ChatMessages chatKey={chat.chatKey} editMessage={editMessage} deleteMessage={deleteMessage} />
+      <ChatMessages chatKey={chat.chatKey} editMessage={editMessage} deleteMessage={deleteMessage} emitReadMessage={emitReadMessage} />
       <ChatComposer chatKey={chatKey} sendMessage={sendMessage} typingUsers={typingUsers} />
     </>
   ) : <Empty icon={<MessagesSquareIcon />} title="No chat selected" description="Select a chat to start chatting." />;
+
+ 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-y-auto transition-all duration-500 ease-in-out">
       {renderLoader()}
       {renderError()}
       {renderChat()}

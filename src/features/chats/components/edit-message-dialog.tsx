@@ -18,6 +18,7 @@ export const EditMessageDialog = ({ message, open, setOpen, editMessage }: EditM
         e.preventDefault()
         editMessage({
             messageId: message.id,
+            clientMsgId: message.clientMsgId,
             chatKey: message.chatKey,
             content: content,
             mentions: message.mentions?.map(m => m.id),

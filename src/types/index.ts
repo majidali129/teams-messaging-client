@@ -6,6 +6,8 @@ import type {
   MessageAttachmentType,
   MessageType,
 } from "./enums";
+import type { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+
 
 export * from "./enums";
 
@@ -181,11 +183,13 @@ export type Chats = {
 
 export interface MessageAttachment {
   url: string;
-  type: MessageAttachmentType;
+  publicId: string;
+  resourceType: MessageAttachmentType; // image pdf video audio
   name: string;
 }
 
 export interface SendMessageInput {
+  clientMsgId: string;
   chatKey: string;
   content: string;
   mentions?: string[];
@@ -201,8 +205,14 @@ export interface DeleteMessageInput {
   chatKey: string;
 }
 
+export interface ReadMessageInput {
+  messageId: string;
+  chatKey: string;
+}
+
 export type Message = {
   id: string;
+  clientMsgId: string;
   content: string;
   type: MessageType;
   sender: User;
@@ -227,3 +237,19 @@ export type Message = {
 export type Messages = Message[]
 
 
+
+// Files ======================
+export interface GetUploadSignatureInput {
+  folderName: string;
+}
+
+export interface UploadSignatureResponse {
+  signature: string;
+  timestamp: number;
+  uploadUrl: string;
+  cloudName: string;
+  folderName: string;
+  api_key: string;
+}
+
+export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;

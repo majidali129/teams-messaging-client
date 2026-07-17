@@ -49,7 +49,7 @@ export const MessageAttachmentType = {
   image: "image",
   video: "video",
   audio: "audio",
-  document: "document",
+  pdf: "pdf",
 } as const;
 export type MessageAttachmentType =
   (typeof MessageAttachmentType)[keyof typeof MessageAttachmentType];

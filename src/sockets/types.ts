@@ -15,6 +15,8 @@ export const EVENTS = {
     MEMBER_REMOVED: "member:removed",
     MESSAGE_EDITED: "message:edited",
     MESSAGE_DELETED: "message:deleted",
+    MESSAGE_READ: "message:read",
+    MESSAGE_READ_RECEIPT: "message:read:receipt",
 } as const;
 
 
@@ -47,6 +49,7 @@ export interface MemberRemovedPayload {
 }
 
 export interface SendMessagePayload {
+    clientMsgId: string;
     chatKey: string;
     content: string;
     mentions?: string[];
@@ -54,5 +57,11 @@ export interface SendMessagePayload {
 }
 
 export interface MessageEditedPayload extends SendMessagePayload {
+    messageId: string;
+}
+
+export interface MessageReadPayload {
+    userId: string;
+    readAt: Date;
     messageId: string;
 }

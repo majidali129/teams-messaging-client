@@ -11,8 +11,8 @@ import { useWorkspace } from "@/features/workspaces/hooks/use-workspace";
 interface ChatListProps {
   chats: Chat[];
   selectedChatKey: string | undefined;
-  onSelectChat: (chatKey: string) => void;
-}
+    onSelectChat: (chatKey: string) => void;
+  }
 
 export const ChatList = ({ chats, selectedChatKey, onSelectChat }: ChatListProps) => {
   const {workspace} = useWorkspace()

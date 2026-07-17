@@ -2,14 +2,14 @@
 import { queryKeys } from "@/query-keys";
 import { socketInstance } from "@/sockets/instance";
 import { EVENTS, type MessageEditedPayload, type SendMessagePayload, type TypingUpdatePayload } from "@/sockets/types";
-import type { Message, DeleteMessageInput } from "@/types";
+import type { Message, DeleteMessageInput, ReadMessageInput } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 
 
-type MessagesChache = {
+export type MessagesChache = {
     messages: Message[];
     total: number
 }
@@ -42,13 +42,18 @@ export const useChatSocket = (chatKey: string | undefined) => {
 
         const onMsgReceive = (message: Message) => {
             if (message.chatKey !== chatKey) return;
+            console.log('onMsgReceive', message);
 
             queryClient.setQueryData<MessagesChache>(queryKeys.chats.messages(chatKey), (old) => {
                 if (!old) return { messages: [message], total: 1 }
-                if (old.messages.some(m => m.id === message.id)) return old;
+
+                const isDuplicateOrOptimistic = old.messages.some(m =>
+                    (message.clientMsgId && m.clientMsgId === message.clientMsgId)
+                );
+                const newMessages = old.messages.map(m => m.clientMsgId === message.clientMsgId ? { ...m, ...message, id: message.id, status: message.status } : m);
                 return {
-                    messages: [...old.messages, message],
-                    total: old.total + 1
+                    messages: newMessages,
+                    total: isDuplicateOrOptimistic ? old.total : old.total + 1
                 }
             });
             queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) })
@@ -75,11 +80,30 @@ export const useChatSocket = (chatKey: string | undefined) => {
 
         const onMsgDelete = (message: Message) => {
             console.log('onMsgDelete', message);
-            if(message.chatKey !== chatKey) return;
+            if (message.chatKey !== chatKey) return;
             queryClient.setQueryData<MessagesChache>(queryKeys.chats.messages(chatKey), (old) => {
-                if(!old) return { messages: [message], total: 1 }
+                if (!old) return { messages: [message], total: 1 }
                 const index = old.messages.findIndex(m => m.id === message.id);
-                if(index !== -1) {
+                if (index !== -1) {
+                    const updatedMessages = [...old.messages];
+                    updatedMessages[index] = message;
+                    return {
+                        messages: updatedMessages,
+                        total: old.total
+                    }
+                }
+                return old;
+            })
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) });
+        }
+
+        const onMsgReadReceipt = (message: Message) => {
+            console.log('onMsgReadReceipt', message);
+            if (message.chatKey !== chatKey) return;
+            queryClient.setQueryData<MessagesChache>(queryKeys.chats.messages(chatKey), (old) => {
+                if (!old) return { messages: [message], total: 1 }
+                const index = old.messages.findIndex(m => m.id === message.id);
+                if (index !== -1) {
                     const updatedMessages = [...old.messages];
                     updatedMessages[index] = message;
                     return {
@@ -96,7 +120,7 @@ export const useChatSocket = (chatKey: string | undefined) => {
         socket.on(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
         socket.on(EVENTS.MESSAGE_EDITED, onMsgEdit)
         socket.on(EVENTS.MESSAGE_DELETED, onMsgDelete)
-
+        socket.on(EVENTS.MESSAGE_READ_RECEIPT, onMsgReadReceipt)
         if (socket.connected) joinChatRoom()
         else {
             socket.connect()
@@ -109,6 +133,7 @@ export const useChatSocket = (chatKey: string | undefined) => {
             socket.off(EVENTS.MESSAGE_EDITED, onMsgEdit)
             socket.off(EVENTS.MESSAGE_DELETED, onMsgDelete)
             socket.off(EVENTS.TYPING_UPDATE, onTyping)
+            socket.off(EVENTS.MESSAGE_READ_RECEIPT, onMsgReadReceipt)
             socket.emit(EVENTS.TYPING_STOP, { chatKey })
         }
 
@@ -122,13 +147,20 @@ export const useChatSocket = (chatKey: string | undefined) => {
 
     const editMessage = (input: MessageEditedPayload) => {
         const socket = socketInstance()
-        if(!socket.connected) socket.connect()
+        if (!socket.connected) socket.connect()
         socket.emit(EVENTS.MESSAGE_EDITED, input)
     }
     const deleteMessage = (input: DeleteMessageInput) => {
         const socket = socketInstance()
-        if(!socket.connected) socket.connect()
+        if (!socket.connected) socket.connect()
         socket.emit(EVENTS.MESSAGE_DELETED, input)
     }
-    return { sendMessage, editMessage, typingUsers, deleteMessage }
+
+    const emitReadMessage = (input: ReadMessageInput) => {
+        const socket = socketInstance()
+        if (!socket.connected) socket.connect()
+        if (input.messageId === undefined || input.chatKey === undefined) return;
+        socket.emit(EVENTS.MESSAGE_READ, input)
+    }
+    return { sendMessage, editMessage, typingUsers, deleteMessage, emitReadMessage }
 }

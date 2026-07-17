@@ -16,7 +16,7 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 export const WorkspaceDetailsHeader = ({workspace}: {workspace: Workspace}) => {
   const { user } = useUser();
   const owner = workspace.owner!;
-  const isOwner = owner.id === user!.id
+  const isOwner = owner.id === user?.id
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 border-b p-4 sm:p-6">

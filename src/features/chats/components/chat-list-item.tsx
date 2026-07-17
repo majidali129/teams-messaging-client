@@ -8,13 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { cn, getAvatar, getInitials } from "@/lib/utils";
 import type { Chat, User } from "@/types";
 import { useUser } from "@/features/auth/hooks/use-user";
+import { useQueryClient } from "@tanstack/react-query";
+import { chatsApi } from "@/api/services/chats";
+import { queryKeys } from "@/query-keys";
 
 const previewForMessage = (chat: Chat, user: User) => {
   const message = chat.lastMessage;
   if (!message) return "No messages yet";
   const sender = message.sender;
   const senderLabel =
-    message.sender.id === user.id ? "You" : sender.name.split(" ")[0];
+    message.sender.id === user?.id ? "You" : sender.name.split(" ")[0];
   const body =
     message.content ||
     (message.attachments?.length ? "Sent an attachment" : "");
@@ -33,13 +36,22 @@ export const ChatListItem = ({
   isActive,
   onSelect,
 }: ChatListItemProps) => {
+  const queryClient = useQueryClient()
   const { user } = useUser();
-  const otherUser = !chat.isChannel
-    ? chat.participants.find((p) => p.id !== user!.id)
+  const otherUser = !chat?.isChannel
+    ? chat?.participants.find((p) => p.id !== user!.id)
     : undefined;
-  const displayName = chat.isChannel
+  const displayName = chat?.isChannel
     ? (chat.name ?? "Channel")
     : (otherUser?.name ?? "Direct message");
+
+  const handleMouseEnter = () => {
+    queryClient.prefetchQuery({
+      queryFn: () => chatsApi.getMessages(chat.chatKey),
+      queryKey: queryKeys.chats.messages(chat.chatKey),
+      staleTime: 50000
+    })
+  }
 
   return (
     <button
@@ -49,6 +61,7 @@ export const ChatListItem = ({
         "flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors",
         isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/60",
       )}
+      onMouseEnter={handleMouseEnter}
     >
       {chat.isChannel ? (
         <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">

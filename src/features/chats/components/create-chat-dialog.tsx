@@ -91,7 +91,7 @@ export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) 
           <div>
             <Label>Participants</Label>
             <div className="mt-1.5 max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
-              {members.filter(m => m.user.id !== user!.id).map((member) => (
+              {members.filter(m => m.user.id !== user?.id).map((member) => (
                 <label
                   key={member.user.id}
                   htmlFor={`participant-${member.user.id}`}

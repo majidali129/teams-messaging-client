@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon, UserMinusIcon } from "lucide-react";
+import { EyeIcon, Loader2Icon, MessageCircleIcon, MoreVerticalIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

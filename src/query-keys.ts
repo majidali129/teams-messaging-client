@@ -17,5 +17,9 @@ export const queryKeys = {
     invites: {
         received: () => ['invites', 'received'] as const,
         all: (workspaceId: string) => ['invites', workspaceId] as const
+    },
+    uploads: {
+        getSignature: () => ['uploads', 'signature'] as const,
+        uploadFile: (publicId: string) => ['uploads', 'file', publicId] as const,
     }
 }

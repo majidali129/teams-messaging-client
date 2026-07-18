@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getAvatar, getInitials } from "@/lib/utils";
 import type { Chat } from "@/types";
 import { ChatDetailsSheet } from "./chat-details-sheet";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { AddParticipantsToChannelDialog } from "./add-participants-to-channel-dialog";
 
 interface ChatHeaderProps {
@@ -16,8 +16,8 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ chat, onBack }: ChatHeaderProps) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const {user} = useUser()  
-  const displayName = chat.isChannel? chat.name: chat.participants.find(p => p.id !== user!.id)?.name
+  const user = useCurrentUser();
+  const displayName = chat.isChannel? chat.name: chat.participants.find(p => p.id !== user.id)?.name
 
   return (
     <div className="flex items-center gap-2 border-b p-3">

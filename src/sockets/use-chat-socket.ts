@@ -56,8 +56,9 @@ export const useChatSocket = (chatKey: string | undefined) => {
                     total: isDuplicateOrOptimistic ? old.total : old.total + 1
                 }
             });
-            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) })
             queryClient.invalidateQueries({ queryKey: queryKeys.chats.details(chatKey) });
+            // Chat-list previews (last message, ordering) are kept in sync by the
+            // always-mounted useAppSocket listener, regardless of which chat is open.
         };
 
         const onMsgEdit = (message: Message) => {
@@ -75,7 +76,9 @@ export const useChatSocket = (chatKey: string | undefined) => {
                 }
                 return old;
             })
-            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.details(chatKey) });
+            // Chat-list preview for an edited last message is kept in sync by
+            // the always-mounted useAppSocket listener.
         }
 
         const onMsgDelete = (message: Message) => {
@@ -94,7 +97,9 @@ export const useChatSocket = (chatKey: string | undefined) => {
                 }
                 return old;
             })
-            queryClient.invalidateQueries({ queryKey: queryKeys.chats.all(workspaceId!) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.chats.details(chatKey) });
+            // Chat-list preview for a deleted last message is kept in sync by
+            // the always-mounted useAppSocket listener.
         }
 
         const onMsgReadReceipt = (message: Message) => {
@@ -128,7 +133,12 @@ export const useChatSocket = (chatKey: string | undefined) => {
         }
 
         return () => {
-            socket.emit(EVENTS.ROOM_LEAVE, { chatKey });
+            // Intentionally NOT emitting ROOM_LEAVE here: the server keeps every
+            // participant's socket joined to all of their chat rooms for the
+            // whole connection lifetime (see events-gateway.ts handleConnection),
+            // so they keep getting message events for chat-list previews even
+            // while this specific chat isn't open. Leaving here would evict them
+            // from that room until their next reconnect.
             socket.off(EVENTS.MESSAGE_RECEIVE, onMsgReceive)
             socket.off(EVENTS.MESSAGE_EDITED, onMsgEdit)
             socket.off(EVENTS.MESSAGE_DELETED, onMsgDelete)

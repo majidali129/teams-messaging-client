@@ -1,4 +1,4 @@
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { PlusIcon } from "lucide-react";
 import { MemberListItem } from "./member-list-item";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,9 @@ export const WorkspaceMembersTab = () => {
     isLoading,
     error,
   } = useWorkspaceMembers(id!);
-  const { user } = useUser();
+  const user = useCurrentUser();
   const canManage =
-    members.find((m) => m.user.id === user!.id)?.role === WorkspaceRole.owner;
+    members.find((m) => m.user.id === user.id)?.role === WorkspaceRole.owner;
 
   const renderLoader = () => {
     if (!isLoading) return null;
@@ -68,7 +68,7 @@ export const WorkspaceMembersTab = () => {
               key={member.user.id}
               member={member}
               canManage={canManage}
-              isSelf={member.user.id === user!.id}
+              isSelf={member.user.id === user.id}
             />
           ))}
         </div>

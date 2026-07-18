@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/message";
 import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/components/ui/bubble";
 import { MessageAttachmentType, MessageStatus, MessageType as MessageTypeEnum, type DeleteMessageInput, type Message as MessageType, type ReadMessageInput, type User } from "@/types";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { ContextMenu, ContextMenuSeparator, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { useEffect, useState } from "react";
 import { EditMessageDialog } from "./edit-message-dialog";
@@ -28,13 +28,13 @@ interface MessageBubbleProps {
 }
 
 export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMessage }: MessageBubbleProps) => {
-  const { user } = useUser()
+  const user = useCurrentUser()
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [showUsersReadMessage, setShowUsersReadMessage] = useState(false)
   const { ref: viewRef, inView } = useInView()
   const sender = message.sender;
-  const isOwn = sender.id === user?.id;
+  const isOwn = sender.id === user.id;
   const replyTo = message.prevMessage;
   const replySender = replyTo ? replyTo.sender : undefined;
   const addedUsers = message.addedUsers;
@@ -79,7 +79,7 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
     return null;
   }
 
-  const isAlreadyRead = readBy.some(user => user.id === user?.id);
+  const isAlreadyRead = readBy.some((reader) => reader.id === user.id);
   useEffect(() => {
     if (inView && !isAlreadyRead && message.status === MessageStatus.delivered && !isOwn) {  
       emitReadMessage({ messageId: message.id, chatKey: message.chatKey });

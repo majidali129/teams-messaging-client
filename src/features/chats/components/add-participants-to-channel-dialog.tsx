@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { getAvatar, getInitials } from "@/lib/utils";
 import type { Chat } from "@/types";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useWorkspaceMembers } from "@/features/workspaces/hooks/use-workspace-members";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { chatsApi } from "@/api/services/chats";
@@ -35,7 +35,7 @@ export const AddParticipantsToChannelDialog = ({
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     [],
   );
-  const { user } = useUser();
+  const user = useCurrentUser();
   const {
     data: { members },
   } = useWorkspaceMembers(chat.workspaceId);
@@ -61,7 +61,7 @@ export const AddParticipantsToChannelDialog = ({
     },
   });
   const otherMembers = members
-    .filter((member) => member.user.id !== user!.id)
+    .filter((member) => member.user.id !== user.id)
     .map((member) => member.user);
   const participants = chat.participants.map((participant) => participant.id);
   const remainingMembers = otherMembers.filter(

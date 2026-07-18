@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getInitials } from "@/lib/utils";
 import { WorkspaceStatus, type Workspace } from "@/types";
 import { InviteMemberDialog } from "./invite-member-dialog";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 
 const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline"> = {
   [WorkspaceStatus.active]: "default",
@@ -14,9 +14,9 @@ const STATUS_VARIANT: Record<WorkspaceStatus, "default" | "secondary" | "outline
 };
 
 export const WorkspaceDetailsHeader = ({workspace}: {workspace: Workspace}) => {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const owner = workspace.owner!;
-  const isOwner = owner.id === user?.id
+  const isOwner = owner.id === user.id
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 border-b p-4 sm:p-6">
@@ -33,7 +33,7 @@ export const WorkspaceDetailsHeader = ({workspace}: {workspace: Workspace}) => {
           </div>
           {owner && (
             <p className="mt-1 text-sm text-muted-foreground">
-              Owned by {owner.id === user?.id ? "you" : owner.name}
+              Owned by {owner.id === user.id ? "you" : owner.name}
             </p>
           )}
         </div>

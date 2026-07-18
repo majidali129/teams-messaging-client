@@ -2,21 +2,24 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { signInPath } from "@/paths";
+import { useUser } from "@/features/auth/hooks/use-user";
+import { CurrentUserProvider } from "@/features/auth/context/current-user-context";
+import { LoadingState } from "./loading-state";
 
 export const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const isAuthenticated = !!localStorage.getItem('access-token')
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null
+  const { user, isAuthenticated, isLoading } = useUser();
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!isLoading && !isAuthenticated) {
       navigate(signInPath(), { replace: true });
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
-  if (!isAuthenticated || !user) {
-    return null;
+  if (isLoading) {
+    return <LoadingState title="Loading your account" description="Please wait while we load your account" className="h-screen" />;
   }
 
-  return children;
+  if (!isAuthenticated || !user) return null;
+  return <CurrentUserProvider user={user}>{children}</CurrentUserProvider>;
 };

@@ -6,7 +6,7 @@ import { MessagesSquareIcon } from "lucide-react";
 import type { Chat } from "@/types";
 import { ChatListItem } from "./chat-list-item";
 import { CreateChatDialog } from "./create-chat-dialog";
-import { useWorkspace } from "@/features/workspaces/hooks/use-workspace";
+import { useCurrentWorkspace } from "@/features/workspaces/context/current-workspace-context";
 
 interface ChatListProps {
   chats: Chat[];
@@ -15,13 +15,13 @@ interface ChatListProps {
   }
 
 export const ChatList = ({ chats, selectedChatKey, onSelectChat }: ChatListProps) => {
-  const {workspace} = useWorkspace()
+  const workspace = useCurrentWorkspace()
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b p-3">
         <h2 className="text-sm font-semibold">Chats</h2>
         <CreateChatDialog
-          workspace={workspace!}
+          workspace={workspace}
           trigger={
             <Button size="sm" variant="outline">
               <PlusIcon />

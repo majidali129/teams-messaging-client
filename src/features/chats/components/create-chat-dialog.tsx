@@ -17,7 +17,7 @@ import { FormError } from "@/components/shared/form-error";
 import { FieldError } from "@/components/shared/field-error";
 import { getAvatar, getInitials } from "@/lib/utils";
 import type { Workspace } from "@/types";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useWorkspaceMembers } from "@/features/workspaces/hooks/use-workspace-members";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { chatsApi } from "@/api/services/chats";
@@ -31,7 +31,7 @@ interface CreateChatDialogProps {
 }
 
 export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) => {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const {data: {members}} = useWorkspaceMembers(workspace.id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -91,7 +91,7 @@ export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) 
           <div>
             <Label>Participants</Label>
             <div className="mt-1.5 max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
-              {members.filter(m => m.user.id !== user?.id).map((member) => (
+              {members.filter(m => m.user.id !== user.id).map((member) => (
                 <label
                   key={member.user.id}
                   htmlFor={`participant-${member.user.id}`}

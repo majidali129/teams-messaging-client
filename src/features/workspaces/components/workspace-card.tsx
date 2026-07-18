@@ -16,7 +16,7 @@ import { workspacePath } from "@/paths";
 import { WorkspaceStatus, type Workspace } from "@/types";
 import { EditWorkspaceDialog } from "./edit-workspace-dialog";
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useWorkspaceMembers } from "../hooks/use-workspace-members";
 
 const STATUS_VARIANT: Record<
@@ -29,11 +29,11 @@ const STATUS_VARIANT: Record<
 };
 
 export const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const {
     data: { members, totalCount },
   } = useWorkspaceMembers(workspace.id);
-  const myRole = members.find((m) => m.user.id === user!.id)?.role;
+  const myRole = members.find((m) => m.user.id === user.id)?.role;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

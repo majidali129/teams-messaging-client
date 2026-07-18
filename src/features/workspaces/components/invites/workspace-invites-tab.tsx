@@ -2,8 +2,8 @@
 import { MailIcon, ShieldAlertIcon } from "lucide-react";
 import { Empty } from "@/components/shared/empty";
 import { InviteListItem } from "./invite-list-item";
-import { useWorkspace } from "../../hooks/use-workspace";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentWorkspace } from "../../context/current-workspace-context";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useWorkspaceInvites } from "../../hooks/use-workspace-invites";
 import { LoadingState } from "@/components/shared/loading-state";
 import { ErrorState } from "@/components/shared/error-state";
@@ -11,12 +11,12 @@ import { useParams } from "react-router";
 
 export const WorkspaceInvitesTab = () => {
   const { id } = useParams();
-  const {workspace} = useWorkspace()
+  const workspace = useCurrentWorkspace()
   const {data: {invites, totalCount}, isLoading, error} = useWorkspaceInvites(id!)
 
-  const {user} = useUser();
+  const user = useCurrentUser();
 
-  const isOwner = workspace!.owner.id === user!.id
+  const isOwner = workspace.owner.id === user.id
 
   if (!isOwner) {
     return (

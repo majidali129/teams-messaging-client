@@ -1,5 +1,4 @@
-import { Link } from "react-router";
-import { Loader2Icon, LogOutIcon, MenuIcon, UserIcon } from "lucide-react";
+import { Loader2Icon, LogOutIcon, MenuIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,12 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getAvatar, getInitials } from "@/lib/utils";
-import { profilePath, signInPath } from "@/paths";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 
 export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const {logout, isPending} = useLogout();
 
   const handleLogout =  () => {
@@ -41,44 +39,38 @@ export const Header = ({ onMenuClick }: { onMenuClick?: () => void }) => {
       <div className="flex items-center gap-3.5">
       {/* <UserReceivedInvites /> */}
 
-        {user ? (
-          <DropdownMenu>
-              <DropdownMenuTrigger
-              render={
-                <Button variant="ghost" className="gap-2 px-1.5" size="lg" disabled={isPending}>
-                    <Avatar size="default">
-                      <AvatarImage src={getAvatar(user.name)} alt={user.name} />
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                    </Avatar>
-                    <span className="hidden text-sm font-medium sm:inline">{user.name}</span>
-                </Button>
-              }
-            >
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="font-normal">
-              <p className="text-sm font-medium text-foreground">{user.name}</p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem render={<Link to={profilePath()} />}>
-              <UserIcon />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={handleLogout} disabled={isPending}>
-              {isPending ? <Loader2Icon className="animate-spin" /> : <LogOutIcon />}
-              Log out
-            </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        ) : (
-          <Button size="lg" className="tracking-wide">
-            <Link to={signInPath()}>Login</Link>
-          </Button>
-        )}
+        <DropdownMenu>
+            <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" className="gap-2 px-1.5" size="lg" disabled={isPending}>
+                  <Avatar size="default">
+                    <AvatarImage src={getAvatar(user.name)} alt={user.name} />
+                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden text-sm font-medium sm:inline">{user.name}</span>
+              </Button>
+            }
+          >
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="font-normal">
+            <p className="text-sm font-medium text-foreground">{user.name}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {/* <DropdownMenuItem render={<Link to={profilePath()} />}>
+            <UserIcon />
+            Profile
+          </DropdownMenuItem> */}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={handleLogout} disabled={isPending}>
+            {isPending ? <Loader2Icon className="animate-spin" /> : <LogOutIcon />}
+            Log out
+          </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
       </div>
     </header>
   );

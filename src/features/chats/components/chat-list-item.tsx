@@ -7,7 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn, getAvatar, getInitials } from "@/lib/utils";
 import type { Chat, User } from "@/types";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { chatsApi } from "@/api/services/chats";
 import { queryKeys } from "@/query-keys";
@@ -17,7 +17,7 @@ const previewForMessage = (chat: Chat, user: User) => {
   if (!message) return "No messages yet";
   const sender = message.sender;
   const senderLabel =
-    message.sender.id === user?.id ? "You" : sender.name.split(" ")[0];
+    message.sender.id === user.id ? "You" : sender.name.split(" ")[0];
   const body =
     message.content ||
     (message.attachments?.length ? "Sent an attachment" : "");
@@ -37,11 +37,11 @@ export const ChatListItem = ({
   onSelect,
 }: ChatListItemProps) => {
   const queryClient = useQueryClient()
-  const { user } = useUser();
-  const otherUser = !chat?.isChannel
-    ? chat?.participants.find((p) => p.id !== user!.id)
-    : undefined;
-  const displayName = chat?.isChannel
+  const user = useCurrentUser();
+  const otherUser = chat.isChannel
+    ? undefined
+    : chat.participants.find((p) => p.id !== user.id);
+  const displayName = chat.isChannel
     ? (chat.name ?? "Channel")
     : (otherUser?.name ?? "Direct message");
 
@@ -66,14 +66,14 @@ export const ChatListItem = ({
       {chat.isChannel ? (
         <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
           <Avatar>
-            <AvatarImage src={getAvatar(chat.name!)} alt={chat.name!} />
-            <AvatarFallback>{getInitials(chat.name!)}</AvatarFallback>
+            <AvatarImage src={getAvatar(displayName)} alt={displayName} />
+            <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
           </Avatar>
         </div>
       ) : (
         <Avatar>
-          <AvatarImage src={getAvatar(otherUser!.name)} alt={otherUser!.name} />
-          <AvatarFallback>{getInitials(otherUser!.name)}</AvatarFallback>
+          <AvatarImage src={getAvatar(displayName)} alt={displayName} />
+          <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
           <AvatarBadge className="bg-green-500" />
         </Avatar>
       )}
@@ -88,7 +88,7 @@ export const ChatListItem = ({
           )}
         </div>
         <p className="truncate text-xs text-muted-foreground">
-          {previewForMessage(chat, user! as User)}
+          {previewForMessage(chat, user)}
         </p>
       </div>
     </button>

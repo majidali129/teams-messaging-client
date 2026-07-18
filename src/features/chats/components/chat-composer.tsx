@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { socketInstance } from "@/sockets/instance";
 import { EVENTS, type SendMessagePayload } from "@/sockets/types";
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { ChatFileUploader } from "./chat-file-uploader";
 import { ChatFilePreview } from "./chat-file-preview";
 import { useGetUploadSignature } from "../hooks/use-get-upload-signature";
@@ -24,7 +24,7 @@ interface ChatComposerProps {
 }
 
 export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposerProps) => {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const [content, setContent] = useState<string>('');
   const formRef = useRef<HTMLFormElement>(null);
   const queryClient = useQueryClient()
@@ -46,8 +46,8 @@ export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposer
     isTypingRef.current = true;
     socket.emit(EVENTS.TYPING_UPDATE, {
       chatKey,
-      userId: user?.id,
-      name: user?.name,
+      userId: user.id,
+      name: user.name,
       isTyping: true
     })
   }
@@ -58,8 +58,8 @@ export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposer
     isTypingRef.current = false;
     socket.emit(EVENTS.TYPING_UPDATE, {
       chatKey,
-      userId: user?.id,
-      name: user?.name,
+      userId: user.id,
+      name: user.name,
       isTyping: false
     })
   }
@@ -103,7 +103,7 @@ export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposer
 
   const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user || uploadingFile || (file && !signatureData)) return;
+    if (uploadingFile || (file && !signatureData)) return;
 
     const text = content.trim();
     const selectedFile = file;

@@ -21,7 +21,7 @@ export const useLogout = () => {
       //   setTimeout(() => navigate(signInPath()), 500);
     },
     onError: (error) => {
-      toast.error("Failed to logout");
+      toast.error(error.message || "Failed to logout");
       console.error(error);
     },
   });

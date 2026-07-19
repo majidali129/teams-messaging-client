@@ -70,6 +70,7 @@ export const useAppSocket = () => {
                     ...chat,
                     lastMessage: {
                         id: message.id,
+                        type: message.type,
                         content: message.content,
                         createdAt: message.createdAt,
                         sender: message.sender,

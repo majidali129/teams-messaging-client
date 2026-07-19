@@ -181,6 +181,7 @@ type MessagePreview = {
   content: string;
   createdAt: string;
   sender: User;
+  type: MessageType;
   attachments?: MessageAttachment[];
 }
 

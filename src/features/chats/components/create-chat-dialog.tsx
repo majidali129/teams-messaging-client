@@ -47,8 +47,8 @@ export const CreateChatDialog = ({ workspace, trigger }: CreateChatDialogProps) 
       navigate(`/workspaces/${workspace.id}/chats?chat=${chat.chatKey}`)
       setOpen(false)
     },
-    onError: () => {
-      toast.error('Failed to create chat')
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create chat')
     }
   })
 

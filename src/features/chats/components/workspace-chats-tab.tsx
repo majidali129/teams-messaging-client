@@ -5,9 +5,7 @@ import { ChatView } from "./chat-view";
 import { ChatEmptyFallback } from "./chat-empty-fallback";
 import { useWorkspaceChats } from "@/features/workspaces/hooks/use-workspace-chats";
 import { LoadingState } from "@/components/shared/loading-state";
-import { ErrorState } from "@/components/shared/error-state";
-import { Empty } from "@/components/shared/empty";
-import { MessagesSquareIcon } from "lucide-react";
+import { ErrorState } from "@/components/shared/error-state"; 
 import { useSearchParams } from "react-router";
 
 export const WorkspaceChatsTab = () => {
@@ -22,12 +20,9 @@ export const WorkspaceChatsTab = () => {
 
   const renderLoader = () => isLoading ? <LoadingState className="h-full" /> : null;
   const renderError = () => !isLoading && error && <ErrorState title="Failed to load chats" description="Please try again later" />;
-  const renderEmpty = () => !isLoading && !error && chats.length === 0 && <Empty icon={<MessagesSquareIcon />} title="No chats yet" description="Create a group chat to start collaborating." />;
-
   return (
     <div className="flex h-full">
       {renderLoader()}
-      {renderEmpty()}
       {renderError()}
       <ChatList
         chats={chats}

@@ -45,9 +45,9 @@ export const useResponseToInvite = (options: RespondOptions = {}) => {
               navigate(workspacesPath(), { replace: true });
             }
         },
-        onError: (_error, variables) => {
+        onError: (error, variables) => {
             const isAccepted = variables.input.status === 'accepted';
-            toast.error(`Failed to ${isAccepted ? 'accept' : 'decline'} invite`);
+            toast.error(error.message || `Failed to ${isAccepted ? 'accept' : 'decline'} invite`);
           },
     })
     return { respondToInvite, isPending }

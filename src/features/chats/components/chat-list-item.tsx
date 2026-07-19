@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn, getAvatar, getInitials } from "@/lib/utils";
-import type { Chat, User } from "@/types";
+import { MessageType, type Chat, type User } from "@/types";
 import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { chatsApi } from "@/api/services/chats";
@@ -21,6 +21,7 @@ const previewForMessage = (chat: Chat, user: User) => {
   const body =
     message.content ||
     (message.attachments?.length ? "Sent an attachment" : "");
+    if(message.type === MessageType.system) return null;
 
   return chat.isChannel ? `${senderLabel}: ${body}` : body;
 };

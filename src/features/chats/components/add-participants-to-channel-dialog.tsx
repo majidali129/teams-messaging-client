@@ -54,9 +54,10 @@ export const AddParticipantsToChannelDialog = ({
       );
       setOpen(false);
     },
-    onError: () => {
+    onError: (error) => {
       toast.error(
-        `Failed to add participant${selectedParticipants.length > 1 ? "s" : ""} to the channel`,
+        error.message ||
+          `Failed to add participant${selectedParticipants.length > 1 ? "s" : ""} to the channel`,
       );
     },
   });

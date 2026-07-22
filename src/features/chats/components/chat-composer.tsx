@@ -11,10 +11,11 @@ import { useGetUploadSignature } from "../hooks/use-get-upload-signature";
 import { useUploadFile } from "../hooks/use-upload-file";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/query-keys";
-import { MessageAttachmentType, MessageStatus, MessageType, type Message, type MessageAttachment } from "@/types";
+import { MessageStatus, MessageType, type Message, type MessageAttachment } from "@/types";
 import { v4 as uuidv4 } from 'uuid';
 import type { MessagesChache } from "@/sockets/use-chat-socket";
 import { toast } from "sonner";
+import { getAttachmentType } from "@/lib/attachment";
 
 
 interface ChatComposerProps {
@@ -91,14 +92,6 @@ export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposer
     setFilePreview(null);
     setUploaderKey(prev => prev + 1);
     setFile(null);
-  }
-
-  const getAttachmentType = (selectedFile: File): MessageAttachmentType => {
-    if (selectedFile.type.startsWith("image/")) return MessageAttachmentType.image;
-    if (selectedFile.type.startsWith("video/")) return MessageAttachmentType.video;
-    if (selectedFile.type.startsWith("audio/")) return MessageAttachmentType.audio;
-    if (selectedFile.type === "application/pdf") return MessageAttachmentType.pdf;
-    throw new Error("This file type is not supported");
   }
 
   const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -226,8 +219,9 @@ export const ChatComposer = ({ chatKey, sendMessage, typingUsers }: ChatComposer
             rows={1}
             className="min-h-9 flex-1 resize-none border-none focus-within:bg-accent  px-1  shadow-none focus-visible:ring-0"
           />
-          {filePreview && (
+          {file && filePreview && (
             <ChatFilePreview
+              file={file}
               preview={filePreview}
               onFileRemove={onFileRemove}
               uploading={uploadingFile}

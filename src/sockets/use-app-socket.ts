@@ -1,7 +1,7 @@
 
 import { socketInstance } from "@/sockets/instance"
 import { useEffect } from "react"
-import { EVENTS, type InviteAcceptedPayload, type MemberRemovedPayload, type PresencePayload } from "./types"
+import { EVENTS, type InviteAcceptedPayload, type MemberRemovedPayload, type PresencePayload, type PresenceSnapshotPayload } from "./types"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/query-keys"
@@ -9,7 +9,6 @@ import type { Chat, Message } from "@/types"
 
 type ChatsCache = { chats: Chat[]; total: number };
 
-// chatKey is always formatted as `${workspaceId}:...` (see api/src/chats/schemas/chat.schema.ts)
 const workspaceIdFromChatKey = (chatKey: string) => chatKey.split(':')[0];
 
 
@@ -19,12 +18,40 @@ export const useAppSocket = () => {
     useEffect(() => {
         const currentSocket = socketInstance()
 
-        const onConnect = () => console.log('[socket] connected', currentSocket.id)
-        const onDisconnect = () => console.log('[socket] disconnected')
-        const onPresenceOnline = (payload: PresencePayload) => {
-            toast.info(`${payload.name} is online`)
-            console.log('onPresenceOnline: ', payload)
+        const onConnect = () => {
+            console.log('[socket] connected', currentSocket.id)
+            currentSocket.emit(document.hidden ? EVENTS.PRESENCE_TAB_HIDDEN : EVENTS.PRESENCE_TAB_VISIBLE)
         }
+
+        const onDisconnect = () => console.log('[socket] disconnected')
+
+        const setOnline = (userId: string, isOnline: boolean) => {
+            queryClient.setQueryData<Set<string>>(queryKeys.presence.snapshot(), (old) => {
+                const next = new Set(old ?? []);
+                if (isOnline) next.add(userId)
+                else next.delete(userId)
+                return next;
+            })
+
+        }
+        const onPresenceOnline = (payload: PresencePayload) => {
+            setOnline(payload.userId, true)
+        }
+
+        const onPresenceOffline = (payload: PresencePayload) => {
+            setOnline(payload.userId, false)
+        }
+
+        const onPresenceSnapshot = (payload: PresenceSnapshotPayload) => {
+            queryClient.setQueryData<Set<string>>(queryKeys.presence.snapshot(), () => new Set(payload.onlineUserIds))
+        }
+
+        const onVisibilityChange = () => {
+            if(!currentSocket.connected) return;
+            console.log('onVisibilityChange: ', document.hidden)
+            currentSocket.emit(document.hidden ? EVENTS.PRESENCE_TAB_HIDDEN : EVENTS.PRESENCE_TAB_VISIBLE)
+        }
+        document.addEventListener('visibilitychange', onVisibilityChange)
 
         const onInviteAccepted = (payload: InviteAcceptedPayload) => {
             console.log(`${payload.name} has accepted your invite`)
@@ -36,9 +63,6 @@ export const useAppSocket = () => {
             queryClient.invalidateQueries({queryKey: queryKeys.invites.received()})
         }
 
-        // Keeps every workspace's chat-list preview (last message, ordering)
-        // in sync no matter which chat (if any) is currently open, since
-        // this hook is mounted once for the whole authenticated app.
         const updateChatsCache = (
             chatKey: string,
             updater: (chat: Chat) => Chat,
@@ -109,6 +133,8 @@ export const useAppSocket = () => {
         }
 
         currentSocket.on(EVENTS.PRESENCE_ONLINE, onPresenceOnline)
+        currentSocket.on(EVENTS.PRESENCE_OFFLINE, onPresenceOffline)
+        currentSocket.on(EVENTS.PRESENCE_SNAPSHOT, onPresenceSnapshot)
         currentSocket.on(EVENTS.INVITE_ACCEPTED, onInviteAccepted)
         currentSocket.on(EVENTS.MEMBER_REMOVED, onMemberRemoved)
         currentSocket.on(EVENTS.MESSAGE_RECEIVE, onMessageReceive)
@@ -119,10 +145,15 @@ export const useAppSocket = () => {
         currentSocket.on('disconnect', onDisconnect)
 
         if (!currentSocket.connected) currentSocket.connect()
+            else onVisibilityChange()
+
         return () => {
+            document.removeEventListener('visibilitychange', onVisibilityChange)
             currentSocket.off('connect', onConnect)
             currentSocket.off('disconnect', onDisconnect)
             currentSocket.off(EVENTS.PRESENCE_ONLINE, onPresenceOnline)
+            currentSocket.off(EVENTS.PRESENCE_OFFLINE, onPresenceOffline)
+            currentSocket.off(EVENTS.PRESENCE_SNAPSHOT, onPresenceSnapshot)
             currentSocket.off(EVENTS.INVITE_ACCEPTED, onInviteAccepted)
             currentSocket.off(EVENTS.MEMBER_REMOVED, onMemberRemoved)
             currentSocket.off(EVENTS.MESSAGE_RECEIVE, onMessageReceive)

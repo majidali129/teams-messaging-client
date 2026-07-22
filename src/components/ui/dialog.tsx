@@ -68,7 +68,7 @@ function DialogContent({
               />
             }
           >
-            <XIcon
+            <XIcon className="text-muted-foreground"
             />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>

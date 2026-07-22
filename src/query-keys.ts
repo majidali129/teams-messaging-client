@@ -22,5 +22,8 @@ export const queryKeys = {
     uploads: {
         getSignature: () => ['uploads', 'signature'] as const,
         uploadFile: (publicId: string) => ['uploads', 'file', publicId] as const,
+    },
+    presence: {
+        snapshot: () => ['presence', 'snapshot'] as const,
     }
 }

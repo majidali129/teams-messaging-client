@@ -11,6 +11,8 @@ import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { chatsApi } from "@/api/services/chats";
 import { queryKeys } from "@/query-keys";
+import { XIcon } from "lucide-react";
+import { usePresence } from "@/sockets/use-presence";
 
 const previewForMessage = (chat: Chat, user: User) => {
   const message = chat.lastMessage;
@@ -39,12 +41,16 @@ export const ChatListItem = ({
 }: ChatListItemProps) => {
   const queryClient = useQueryClient()
   const user = useCurrentUser();
+  const onlineUserIds = usePresence();
   const otherUser = chat.isChannel
     ? undefined
     : chat.participants.find((p) => p.id !== user.id);
   const displayName = chat.isChannel
     ? (chat.name ?? "Channel")
     : (otherUser?.name ?? "Direct message");
+    const isOtherUserOnline = !!otherUser && onlineUserIds.has(otherUser.id);
+
+    console.log('isOtherUserOnline: ', isOtherUserOnline)
 
   const handleMouseEnter = () => {
     queryClient.prefetchQuery({
@@ -75,7 +81,9 @@ export const ChatListItem = ({
         <Avatar>
           <AvatarImage src={getAvatar(displayName)} alt={displayName} />
           <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
-          <AvatarBadge className="bg-green-500" />
+          <AvatarBadge className={isOtherUserOnline ? "bg-green-500" : "bg-muted-foreground"}>
+          {!isOtherUserOnline && <XIcon />}
+          </AvatarBadge>
         </Avatar>
       )}
 

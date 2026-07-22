@@ -1,4 +1,4 @@
-import { Check, CheckCheck, Clock, FileIcon, PencilIcon, ShareIcon, TrashIcon, UserIcon } from "lucide-react";
+import { Check, CheckCheck, Clock, FileIcon, PencilIcon, PlayIcon, ShareIcon, TrashIcon, UserIcon } from "lucide-react";
 import {
   Message,
   MessageContent,
@@ -6,12 +6,13 @@ import {
   MessageHeader,
 } from "@/components/ui/message";
 import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/components/ui/bubble";
-import { MessageAttachmentType, MessageStatus, MessageType as MessageTypeEnum, type DeleteMessageInput, type Message as MessageType, type ReadMessageInput, type User } from "@/types";
+import { MessageAttachmentType, MessageStatus, MessageType as MessageTypeEnum, type DeleteMessageInput, type Message as MessageType, type MessageAttachment, type ReadMessageInput, type User } from "@/types";
 import { useCurrentUser } from "@/features/auth/context/current-user-context";
 import { ContextMenu, ContextMenuSeparator, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { useEffect, useState } from "react";
 import { EditMessageDialog } from "./edit-message-dialog";
 import { DeleteMessageDialog } from "./delete-message-dialog";
+import { AttachmentPreviewDialog } from "./attachment-preview-dialog";
 import type { MessageEditedPayload } from "@/sockets/types";
 import { Popover, PopoverContent, PopoverHeader, PopoverTrigger } from "@/components/ui/popover";
 import { Empty } from "@/components/shared/empty";
@@ -32,6 +33,7 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [showUsersReadMessage, setShowUsersReadMessage] = useState(false)
+  const [previewAttachment, setPreviewAttachment] = useState<MessageAttachment | null>(null)
   const { ref: viewRef, inView } = useInView()
   const sender = message.sender;
   const isOwn = sender.id === user.id;
@@ -39,10 +41,7 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
   const replySender = replyTo ? replyTo.sender : undefined;
   const addedUsers = message.addedUsers;
   const readBy = message.readBy ?? [];
-  const isRead = readBy.length > 0 && message.status === MessageStatus.read;
-  console.log(message)
-
-  console.log(isRead, message.status, readBy);
+    const isRead = readBy.length > 0 && message.status === MessageStatus.read;
 
   const isSystemMessage = message.type === MessageTypeEnum.system;
   const systemMessageContent = isSystemMessage ? `added ${addedUsers?.map(user => user.name).join(', ')} to the chat` : message.content;
@@ -121,24 +120,36 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
                       <div>
                         <div className="space-y-2">
 
-                          {/* 1. If attachments exist, map and render them regardless of text */}
                           {message.attachments && message.attachments.length > 0 && (
                             <div className="flex flex-col gap-2">
                               {message.attachments.map((attachment, index) => (
                                 attachment.resourceType === MessageAttachmentType.image ? (
-                                  <img
+                                  <button
                                     key={`${attachment.url}-${index}`}
-                                    src={attachment.url}
-                                    alt={attachment.name}
-                                    className="block max-w-64 rounded-lg"
-                                  />
+                                    type="button"
+                                    onClick={() => setPreviewAttachment(attachment)}
+                                    className="block max-w-64 cursor-pointer overflow-hidden rounded-lg"
+                                  >
+                                    <img
+                                      src={attachment.url}
+                                      alt={attachment.name}
+                                      className="block w-full transition-opacity hover:opacity-90"
+                                    />
+                                  </button>
                                 ) : attachment.resourceType === MessageAttachmentType.video ? (
-                                  <video
+                                  <button
                                     key={`${attachment.url}-${index}`}
-                                    src={attachment.url}
-                                    controls
-                                    className="block max-w-64 rounded-lg"
-                                  />
+                                    type="button"
+                                    onClick={() => setPreviewAttachment(attachment)}
+                                    className="group relative block max-w-64 cursor-pointer overflow-hidden rounded-lg"
+                                  >
+                                    <video src={attachment.url} muted playsInline className="block w-full" />
+                                    <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
+                                      <span className="flex size-10 items-center justify-center rounded-full bg-black/50 text-white">
+                                        <PlayIcon className="size-5 fill-current" />
+                                      </span>
+                                    </span>
+                                  </button>
                                 ) : (
                                   <a
                                     key={`${attachment.url}-${index}`}
@@ -155,7 +166,6 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
                             </div>
                           )}
 
-                          {/* 2. If content text exists, render it right below the images */}
                           {message.content && (
                             <p className="whitespace-pre-wrap text-left mr-16.5">
                               {message.content}
@@ -213,6 +223,7 @@ export const MessageBubble = ({ message, editMessage, deleteMessage, emitReadMes
 
         <EditMessageDialog message={message} open={openEditDialog} setOpen={setOpenEditDialog} editMessage={editMessage} />
         <DeleteMessageDialog message={message} open={openDeleteDialog} setOpen={setOpenDeleteDialog} deleteMessage={deleteMessage} />
+        <AttachmentPreviewDialog attachment={previewAttachment} onOpenChange={(open) => !open && setPreviewAttachment(null)} />
       </Message>
       {/* for message read event */}
       <div ref={viewRef} />

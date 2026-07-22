@@ -17,6 +17,9 @@ export const EVENTS = {
     MESSAGE_DELETED: "message:deleted",
     MESSAGE_READ: "message:read",
     MESSAGE_READ_RECEIPT: "message:read:receipt",
+    PRESENCE_TAB_HIDDEN: "presence:tab:hidden",
+    PRESENCE_TAB_VISIBLE: "presence:tab:visible",
+    PRESENCE_SNAPSHOT: "presence:snapshot",
 } as const;
 
 
@@ -64,4 +67,7 @@ export interface MessageReadPayload {
     userId: string;
     readAt: Date;
     messageId: string;
+}
+export interface PresenceSnapshotPayload {
+    onlineUserIds: string[];
 }
